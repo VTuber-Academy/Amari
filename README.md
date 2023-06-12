@@ -5,8 +5,6 @@
   [![VTuber Academy](https://dcbadge.vercel.app/api/server/vta)](https://discord.gg/vta)
 </div>
 
----
-# Amari 🥠
 Amari is a versatile Discord bot designed to enhance the VTA (VTuber Academy) community by facilitating efficient back-end operations and promoting engaging interactions. With features such as VTuber, Artists, and Staff applications, ModMail, Silent Levelling, Radio, and more, Amari aims to streamline community management and create a vibrant and enjoyable atmosphere. Built using the sapphire.js framework in Node.js, Amari incorporates additional components to ensure Test-Driven Development (TDD) practices for robust and reliable performance.
 
 ## Features 📺
