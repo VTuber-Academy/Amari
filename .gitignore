@@ -1,7 +1,7 @@
 # Ignore a blackhole and the folder for development
 node_modules/
 .vs/
-.idea/
+.idea/gi
 *.iml
 
 # Yarn files
