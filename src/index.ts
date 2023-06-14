@@ -26,16 +26,21 @@ const client = new SapphireClient({
 	loadMessageCommandListeners: true
 });
 
-const main = async () => {
+const main = async (mock: any) => {
+	const Client = mock ? mock : client
+
 	try {
-		client.logger.info('Logging in');
-		await client.login();
-		client.logger.info('logged in');
+		Client.logger.info('Logging in');
+		await Client.login();
+		Client.logger.info('logged in');
 	} catch (error) {
-		client.logger.fatal(error);
-		client.destroy();
+		Client.logger.fatal(error);
+		Client.destroy();
 		process.exit(1);
 	}
 };
 
-main();
+main(undefined);
+
+// export for testing
+export default main;
