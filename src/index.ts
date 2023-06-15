@@ -3,17 +3,12 @@ import { LogLevel, SapphireClient } from '@sapphire/framework';
 import { GatewayIntentBits, Partials } from 'discord.js';
 
 const client = new SapphireClient({
-	defaultPrefix: '!',
-	regexPrefix: /^(hey +)?bot[,! ]/i,
-	caseInsensitiveCommands: true,
 	logger: {
 		level: LogLevel.Debug
 	},
-	shards: 'auto',
 	intents: [
 		GatewayIntentBits.DirectMessageReactions,
 		GatewayIntentBits.DirectMessages,
-		GatewayIntentBits.GuildBans,
 		GatewayIntentBits.GuildEmojisAndStickers,
 		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.GuildMessageReactions,
@@ -22,25 +17,20 @@ const client = new SapphireClient({
 		GatewayIntentBits.GuildVoiceStates,
 		GatewayIntentBits.MessageContent
 	],
-	partials: [Partials.Channel],
-	loadMessageCommandListeners: true
+	partials: [Partials.Channel, Partials.Message],
+	loadMessageCommandListeners: true,
 });
 
-const main = async (mock: any) => {
-	const Client = mock ? mock : client
-
+const main = async () => {
 	try {
-		Client.logger.info('Logging in');
-		await Client.login();
-		Client.logger.info('logged in');
+		client.logger.info('Logging in');
+		await client.login();
+		client.logger.info('logged in');
 	} catch (error) {
-		Client.logger.fatal(error);
-		Client.destroy();
+		client.logger.fatal(error);
+		client.destroy();
 		process.exit(1);
 	}
 };
 
-main(undefined);
-
-// export for testing
-export default main;
+main();
