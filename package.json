@@ -15,24 +15,23 @@
 		"@sapphire/plugin-editable-commands": "^3.0.2",
 		"@sapphire/plugin-logger": "^3.0.3",
 		"@sapphire/plugin-subcommands": "^4.0.1",
+		"@sapphire/stopwatch": "^1.5.0",
 		"@sapphire/time-utilities": "^1.7.9",
 		"@sapphire/type": "^2.4.0",
 		"@sapphire/utilities": "^3.11.1",
 		"@skyra/env-utilities": "^1.2.0",
 		"colorette": "^2.0.20",
-		"discord.js": "^14.10.2"
+		"discord.js": "^14.10.2",
+		"mongoose": "^7.3.0"
 	},
 	"devDependencies": {
 		"@sapphire/cli": "^1.6.1",
 		"@sapphire/prettier-config": "^1.4.5",
 		"@sapphire/ts-config": "^4.0.0",
-		"@types/node": "^18.16.3",
-		"@types/ws": "^8.5.4",
-		"@typescript-eslint/eslint-plugin": "^5.50.0",
-		"@vitest/coverage-v8": "^0.32.0",
-		"@vitest/ui": "^0.32.0",
 		"eslint": "^8.42.0",
 		"eslint-config-standard-with-typescript": "^35.0.0",
+		"eslint-config-xo": "^0.43.1",
+		"eslint-config-xo-typescript": "^0.57.0",
 		"eslint-plugin-import": "^2.25.2",
 		"eslint-plugin-n": "^15.0.0",
 		"eslint-plugin-promise": "^6.0.0",
@@ -47,10 +46,7 @@
 		"watch": "tsc -w",
 		"start": "node dist/index.js",
 		"dev": "run-s build start",
-		"watch:start": "tsc-watch --onSuccess \"node ./dist/index.js\"",
-		"format": "prettier --write \"src/**/*.ts\"",
-		"test": "vitest --run -r=src/ --passWithNoTests",
-		"devTest": "vitest --watch -r=src/ --ui --coverage --passWithNoTests"
+		"watch:start": "tsc-watch --onSuccess \"node ./dist/index.js\""
 	},
 	"prettier": "@sapphire/prettier-config"
 }
