@@ -27,11 +27,20 @@ class SettingsDb {
 			settings = new settingsModel({
 				guildId: guildID,
 				amariLevel: {
-					cooldown: 120000,
+					algorithm: '(($level$ + 1) * 5)^2',
+					message: {
+						cooldown: 60000,
+						reward: '(15 * $contentLength$) / 30',
+					},
+					voice: {
+						cooldown: 120000,
+						reward: '5',
+					},
 				},
 			});
 		}
 
+		await settings.save();
 		return settings;
 	}
 }

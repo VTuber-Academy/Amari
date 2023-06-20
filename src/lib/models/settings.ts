@@ -3,14 +3,30 @@ import {Schema, model} from 'mongoose';
 type SettingsI = {
 	guildId: string;
 	amariLevel: {
-		cooldown: number;
+		algorithm: string;
+		message: {
+			cooldown: number;
+			reward: string;
+		};
+		voice: {
+			cooldown: number;
+			reward: string;
+		};
 	};
 };
 
 const settingSchema = new Schema<SettingsI>({
 	guildId: String,
 	amariLevel: {
-		cooldown: Number,
+		algorithm: String,
+		message: {
+			reward: String,
+			cooldown: Number,
+		},
+		voice: {
+			reward: String,
+			cooldown: Number,
+		},
 	},
 });
 
