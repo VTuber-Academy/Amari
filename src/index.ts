@@ -27,13 +27,13 @@ const client = new SapphireClient({
 });
 
 const main = async () => {
-	const rootData = getRootData();
+	try {
+		const rootData = getRootData();
 	for (const [name, path] of Object.entries(modules)) {
 		client.stores.registerPath(join(rootData.root, path));
-		client.logger.info(`Registered Module ${name}`);
+		client.logger.info(`Registered Module: ${name}`);
 	}
 
-	try {
 		client.logger.info('Logging in');
 		await client.login();
 		client.logger.info(`Successfully logged in as ${client.user?.username}`);
