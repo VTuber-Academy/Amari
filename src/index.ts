@@ -23,16 +23,16 @@ const client = new SapphireClient({
 		GatewayIntentBits.GuildVoiceStates,
 		GatewayIntentBits.MessageContent
 	],
-	partials: [Partials.Channel],
+	partials: [Partials.Channel]
 });
 
 const main = async () => {
 	try {
 		const rootData = getRootData();
-	for (const [name, path] of Object.entries(modules)) {
-		client.stores.registerPath(join(rootData.root, path));
-		client.logger.info(`Registered Module: ${name}`);
-	}
+		for (const [name, path] of Object.entries(modules)) {
+			client.stores.registerPath(join(rootData.root, path));
+			client.logger.info(`Registered Module: ${name}`);
+		}
 
 		client.logger.info('Logging in');
 		await client.login();
