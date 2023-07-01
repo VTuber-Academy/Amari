@@ -1,19 +1,20 @@
-import './lib/setup';
+import './Amari Core/lib/setup';
+
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import { GatewayIntentBits, Partials } from 'discord.js';
 
+import { getRootData } from '@sapphire/pieces';
+import modules from './moduleRegistry.json';
+import { join } from 'node:path';
+
 const client = new SapphireClient({
-	defaultPrefix: '!',
-	regexPrefix: /^(hey +)?bot[,! ]/i,
-	caseInsensitiveCommands: true,
 	logger: {
 		level: LogLevel.Debug
 	},
-	shards: 'auto',
 	intents: [
 		GatewayIntentBits.DirectMessageReactions,
 		GatewayIntentBits.DirectMessages,
-		GatewayIntentBits.GuildBans,
+		GatewayIntentBits.GuildModeration,
 		GatewayIntentBits.GuildEmojisAndStickers,
 		GatewayIntentBits.GuildMembers,
 		GatewayIntentBits.GuildMessageReactions,
@@ -23,24 +24,24 @@ const client = new SapphireClient({
 		GatewayIntentBits.MessageContent
 	],
 	partials: [Partials.Channel],
-	loadMessageCommandListeners: true
 });
 
-const main = async (mock: any) => {
-	const Client = mock ? mock : client
+const main = async () => {
+	const rootData = getRootData();
+	for (const [name, path] of Object.entries(modules)) {
+		client.stores.registerPath(join(rootData.root, path));
+		client.logger.info(`Registered Module ${name}`);
+	}
 
 	try {
-		Client.logger.info('Logging in');
-		await Client.login();
-		Client.logger.info('logged in');
+		client.logger.info('Logging in');
+		await client.login();
+		client.logger.info(`Successfully logged in as ${client.user?.username}`);
 	} catch (error) {
-		Client.logger.fatal(error);
-		Client.destroy();
+		client.logger.fatal(error);
+		client.destroy();
 		process.exit(1);
 	}
 };
 
-main(undefined);
-
-// export for testing
-export default main;
+main();
