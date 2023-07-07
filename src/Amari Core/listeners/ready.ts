@@ -1,6 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Listener, type Store } from '@sapphire/framework';
 import { blue, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
+import mongoose from 'mongoose';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -8,9 +9,22 @@ const dev = process.env.NODE_ENV !== 'production';
 export class UserEvent extends Listener {
 	private readonly style = dev ? yellow : blue;
 
-	public run() {
+	public async run() {
 		this.printBanner();
 		this.printStoreDebugInformation();
+
+		await this.connectMongo();
+	}
+
+	private async connectMongo() {
+		if (!process.env.MongoDB_URL) {
+			return new Error('Mongo Database URL not provided in .env');
+		}
+
+		return mongoose
+			.connect(process.env.MongoDB_URL, { dbName: process.env.MongoDB_Name })
+			.catch((error) => new Error(error))
+			.then(() => this.container.logger.info(`Mongoose successfully connected!`));
 	}
 
 	private printBanner() {
