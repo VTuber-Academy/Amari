@@ -34,7 +34,7 @@ class LevelManager {
 	}
 
 	private calculateNextLevelXP(currentLevel: number) {
-		return 5 * (currentLevel ^ 2) + 50 * currentLevel + 100;
+		return 2 * currentLevel + 20 * currentLevel + 40;
 	}
 }
 

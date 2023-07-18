@@ -1,3 +1,4 @@
 {
-    "IgnoreChannels": []
+    "messageCooldown": "1 minute",
+    "IgnoreChannels": ["1103870663195889705", "1103870686092595200", "1103870709157085204"]
 }

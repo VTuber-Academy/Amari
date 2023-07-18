@@ -13,10 +13,13 @@ export class UserEvent extends Listener {
 	public override async run(oldState: VoiceState, newState: VoiceState) {
 		if (!oldState && newState) {
 			// User joined channel
+			this.startTracker();
 		} else if (oldState && newState) {
 			// User moved channel
 		} else if (oldState && !newState) {
 			// User left channel
 		}
 	}
+
+	private startTracker() {}
 }
