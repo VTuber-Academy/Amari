@@ -6,7 +6,9 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
-import { EmbedBuilder } from 'discord.js';
+import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
+import levelManager from '../lib/levelManager';
+import { Rank } from 'canvacord';
 
 @ApplyOptions<Subcommand.Options>({
 	name: 'Levels',
@@ -156,6 +158,42 @@ export class UserCommand extends Subcommand {
 			content: `${deducted.username} has been notified!`,
 			embeds: [notifier],
 			ephemeral: true
+		});
+	}
+
+	public async rankCommand(interaction: Subcommand.ChatInputCommandInteraction) {
+		await interaction.deferReply({ ephemeral: true });
+
+		const targetUser = interaction.options.getUser('of') ?? interaction.user;
+		const targetProfile = await levelDatabase.findOne({ id: targetUser.id });
+
+		if (!targetProfile) {
+			return interaction.editReply(`${targetUser} has never meowed in the server before! (╯°□°)╯︵ ┻━┻`);
+		}
+
+		// TODO Align Level and experience to the right
+		// TODO Make profile picture a tad bit smaller
+
+		const card = new Rank()
+			.setAvatar(targetUser.displayAvatarURL())
+			.setCurrentXP(targetProfile.experience, '#333333')
+			.setLevel(targetProfile.level)
+			.setLevelColor('#FFFFFf')
+			.setRank(0, '', false)
+			.setProgressBar(['#D84549', '#F18B8F'], 'GRADIENT', true)
+			.setBackground('COLOR', '#E94D51')
+			.setRequiredXP(levelManager.calculateNextLevelXP(targetProfile.level), '#B53E40')
+			.setUsername(targetUser.username);
+
+		return card.build().then(async (data) => {
+			const attachment = new AttachmentBuilder(data, {
+				name: `RC-${targetUser.username}-${Date.now()}.png`,
+				description: `${targetUser.username}'s Rank card generated on ${new Date()}`
+			});
+
+			return interaction.editReply({
+				files: [attachment]
+			});
 		});
 	}
 }

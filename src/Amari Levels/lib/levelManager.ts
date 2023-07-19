@@ -9,6 +9,18 @@ class LevelManager {
 		return this.modifyXP(`-${amount}`, toUserId);
 	}
 
+	async fetchLeaderboard() {
+		const entries = await levelDatabase.find({});
+
+		return entries.sort((a, b) => {
+			if (a.level === b.level) {
+				return b.experience - a.experience;
+			} else {
+				return b.level - a.level;
+			}
+		});
+	}
+
 	private async modifyXP(amountAsString: string, toUserId: string) {
 		let userEntry = await levelDatabase.findOne({ id: toUserId });
 
@@ -33,7 +45,7 @@ class LevelManager {
 		return this.calculateNextLevelXP(currentLevel) < currentXP;
 	}
 
-	private calculateNextLevelXP(currentLevel: number) {
+	calculateNextLevelXP(currentLevel: number) {
 		return 2 * currentLevel + 20 * currentLevel + 40;
 	}
 }

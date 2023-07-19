@@ -8,11 +8,11 @@ export interface levelsInterface {
 }
 
 const levelSchema = new Schema<levelsInterface>({
-	id: String,
-	level: Number,
-	experience: Number,
-	lastActivity: Date
+	id: { type: String, required: true },
+	level: { type: Number, default: 0 },
+	experience: { type: Number, default: 0 },
+	lastActivity: { type: Number, default: new Date() }
 });
 
-const levelDatabase = model<levelsInterface>('Levels', levelSchema);
+const levelDatabase = model<levelsInterface>('Amari Levels', levelSchema);
 export default levelDatabase;
