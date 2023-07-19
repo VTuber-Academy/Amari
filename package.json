@@ -19,6 +19,7 @@
 		"@sapphire/type": "^2.4.0",
 		"@sapphire/utilities": "^3.11.1",
 		"@skyra/env-utilities": "^1.2.0",
+		"canvacord": "github:VTuber-Academy/canvacord",
 		"colorette": "^2.0.20",
 		"discord.js": "^14.10.2",
 		"mongoose": "^7.3.1"
