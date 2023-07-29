@@ -15,7 +15,7 @@ export class UserEvent extends Listener {
 	public override async run(oldState: VoiceState, newState: VoiceState) {
 		if (!oldState.channelId && newState.channelId) {
 			if (!newState.member) return;
-			return trackerMap.set(newState.member.id, new Stopwatch());
+			trackerMap.set(newState.member.id, new Stopwatch());
 		} else if (oldState.channelId && !newState.channelId) {
 			if (!oldState.member) return;
 
@@ -33,9 +33,7 @@ export class UserEvent extends Listener {
 				xp += Math.floor(Math.random() * (5 - 2.5 + 1)) + 2.5;
 			}
 
-			return levelManager.addXP(xp, oldState.member.id);
+			levelManager.addXP(xp, oldState.member.id);
 		}
-
-		return;
 	}
 }
