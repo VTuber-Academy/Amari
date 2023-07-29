@@ -23,7 +23,7 @@ const client = new SapphireClient({
 		GatewayIntentBits.GuildVoiceStates,
 		GatewayIntentBits.MessageContent
 	],
-	partials: [Partials.Channel]
+	partials: [Partials.Channel, Partials.GuildMember]
 });
 
 const main = async () => {

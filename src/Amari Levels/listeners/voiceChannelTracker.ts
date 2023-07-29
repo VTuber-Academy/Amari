@@ -1,9 +1,11 @@
-// TODO: Track how long that member has been in a voice channel for
-// TODO: Calculate how many times the cooldown would've been finished
-// TODO: Reward 5 xp for every minute passed in the VC
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
 import type { VoiceState } from 'discord.js';
+import { Stopwatch } from '@sapphire/stopwatch';
+import { Duration } from '@sapphire/time-utilities';
+import levelManager from '../lib/levelManager';
+
+const trackerMap = new Map<string, Stopwatch>();
 
 @ApplyOptions<Listener.Options>({
 	event: Events.VoiceStateUpdate,
@@ -11,15 +13,29 @@ import type { VoiceState } from 'discord.js';
 })
 export class UserEvent extends Listener {
 	public override async run(oldState: VoiceState, newState: VoiceState) {
-		if (!oldState && newState) {
-			// User joined channel
-			this.startTracker();
-		} else if (oldState && newState) {
-			// User moved channel
-		} else if (oldState && !newState) {
-			// User left channel
-		}
-	}
+		if (!oldState.channelId && newState.channelId) {
+			if (!newState.member) return;
+			return trackerMap.set(newState.member.id, new Stopwatch());
+		} else if (oldState.channelId && !newState.channelId) {
+			if (!oldState.member) return;
 
-	private startTracker() {}
+			const stopwatch = trackerMap.get(oldState.member.id);
+			if (!stopwatch) return;
+			stopwatch.stop();
+
+			trackerMap.delete(oldState.member.id);
+
+			const minutes = Math.floor(new Duration(stopwatch.toString()).seconds / 60);
+
+			let xp = 0;
+
+			for (let minute = 0; minute < minutes; minute++) {
+				xp += Math.floor(Math.random() * (5 - 2.5 + 1)) + 2.5;
+			}
+
+			return levelManager.addXP(xp, oldState.member.id);
+		}
+
+		return;
+	}
 }

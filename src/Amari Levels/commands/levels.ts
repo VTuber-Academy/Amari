@@ -1,8 +1,3 @@
-// TODO: /levels rank (of: user)
-// TODO: /levels leaderboard (of: VTubers | Members | All)
-// TODO: /levels give-level [to: User] [an amount of: level]
-// TODO: /levels remove-level [from: User] [an amount of: level]
-
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
@@ -58,17 +53,7 @@ export class UserCommand extends Subcommand {
 						)
 						.addUserOption((input) => input.setName('from').setDescription('The user that is going to gain levels').setRequired(true))
 				)
-				.addSubcommand((command) =>
-					command
-						.setName('leaderboard')
-						.setDescription("Ladders of every member's activity")
-						.addStringOption((input) =>
-							input
-								.setName('of')
-								.setDescription("Category of member's activities")
-								.setChoices({ name: 'VTuber', value: 'VTuber' }, { name: 'Members', value: 'Members' }, { name: 'All', value: 'All' })
-						)
-				)
+				.addSubcommand((command) => command.setName('leaderboard').setDescription("Ladders of every member's activity"))
 				.addSubcommand((command) =>
 					command
 						.setName('rank')
@@ -171,19 +156,16 @@ export class UserCommand extends Subcommand {
 			return interaction.editReply(`${targetUser} has never meowed in the server before! (╯°□°)╯︵ ┻━┻`);
 		}
 
-		// TODO Align Level and experience to the right
-		// TODO Make profile picture a tad bit smaller
-
 		const card = new Rank()
 			.setAvatar(targetUser.displayAvatarURL())
-			.setCurrentXP(targetProfile.experience, '#333333')
+			.setCurrentXP(targetProfile.experience, '#FFFFFF')
 			.setLevel(targetProfile.level)
 			.setLevelColor('#FFFFFf')
 			.setRank(0, '', false)
 			.setProgressBar(['#D84549', '#F18B8F'], 'GRADIENT', true)
-			.setBackground('COLOR', '#E94D51')
+			.setBackground('COLOR', '#383444')
 			.setRequiredXP(levelManager.calculateNextLevelXP(targetProfile.level), '#B53E40')
-			.setUsername(targetUser.username);
+			.setUsername(`@${targetUser.username}`);
 
 		return card.build().then(async (data) => {
 			const attachment = new AttachmentBuilder(data, {
@@ -194,6 +176,35 @@ export class UserCommand extends Subcommand {
 			return interaction.editReply({
 				files: [attachment]
 			});
+		});
+	}
+
+	public async leaderboardCommand(interaction: Subcommand.ChatInputCommandInteraction) {
+		await interaction.deferReply({ ephemeral: true });
+
+		const leaderboardEmbed = new EmbedBuilder()
+			.setColor('Aqua')
+			.setTitle('**Top 10 Active Members!**')
+			.setFooter({ text: 'Talk in the server to get a ranking!' });
+
+		const allUsers = await levelDatabase
+			.find({})
+			.sort({ level: -1, experience: -1 })
+			.catch(() => []);
+
+		if (allUsers.length === 0)
+			leaderboardEmbed.setDescription('No Data Available! This usually happens when the code errored out or no one has talked in the server!');
+
+		const memberRanking = allUsers.findIndex((member) => member.id === interaction.user.id) + 1;
+		if (memberRanking !== 0) leaderboardEmbed.setFooter({ text: `You rank #${memberRanking}!` });
+
+		const topTen = allUsers.slice(0, 10);
+		leaderboardEmbed.setDescription(
+			topTen.map((member, index) => `#${index + 1} - <@${member.id}> - Level: ${member.level} Exp: ${member.experience}`).join('\n')
+		);
+
+		return interaction.editReply({
+			embeds: [leaderboardEmbed]
 		});
 	}
 }
