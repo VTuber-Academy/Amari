@@ -37,6 +37,8 @@ class LevelManager {
 			userEntry.experience = 0;
 		}
 
+		userEntry.lastActivity = new Date();
+
 		await userEntry.save();
 		return isLevelUp;
 	}

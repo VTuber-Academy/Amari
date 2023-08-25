@@ -7,6 +7,19 @@ import { getRootData } from '@sapphire/pieces';
 import modules from './moduleRegistry.json';
 import { join } from 'node:path';
 
+import express from 'express';
+const app = express();
+const port = 10000;
+
+app.get('/', (_req, res) => {
+	// 200 status code means OK
+	res.status(200).send('OK');
+});
+
+app.listen(port, () => {
+	console.log(`VTA BOT listening on port ${port}`);
+});
+
 const client = new SapphireClient({
 	logger: {
 		level: LogLevel.Debug
