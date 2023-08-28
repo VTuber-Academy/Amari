@@ -12,11 +12,12 @@ export class UserEvent extends Listener {
 	public override async run(levelDB: LevelsInterface) {
 		const server = this.container.client.guilds.cache.get('747485611409145889');
 		const member = await server?.members.fetch(levelDB.id);
+		if (!member) return;
 
 		if (levelDB.level === 3) {
-			return member?.roles.add('759085739723456563');
+			return member.roles.add('759085739723456563');
 		}
 
-		return;
+		return this.container.logger.info(`@${member.user.username} has levelled up!`);
 	}
 }
