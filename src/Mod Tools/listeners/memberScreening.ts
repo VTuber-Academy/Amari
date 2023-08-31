@@ -39,9 +39,10 @@ export class UserEvent extends Listener {
 			);
 
 		const names: string[] = [];
-		createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv'))
-			.pipe(csvParser())
-			.on('data', (row: CsvRow) => {
+		const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv'))
+			.pipe(csvParser());
+
+		stream.on('data', (row: CsvRow) => {
 				if (row["Child's First Name"]) {
 					names.push(row["Child's First Name"]);
 				}
