@@ -10,6 +10,7 @@ import {
 	ButtonStyle
 } from 'discord.js';
 import config from '../config.json';
+import { createReadStream } from 'fs';
 
 @ApplyOptions<Listener.Options>({
 	name: 'Member Screening',
