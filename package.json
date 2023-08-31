@@ -47,7 +47,7 @@
 	"scripts": {
 		"sapphire": "sapphire",
 		"generate": "sapphire generate",
-		"build": "swc ./src -d ./dist",
+		"build": "swc ./src -d ./dist --copy-files",
 		"watch": "swc ./src -d ./dist -w",
 		"start": "node dist/index.js",
 		"dev": "run-s build start",
