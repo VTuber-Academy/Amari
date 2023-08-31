@@ -51,7 +51,7 @@ export class UserEvent extends Listener {
 		trie.addAll(names.map((name) => ({ name: name.toLowerCase() })));
 
 		const matches = trie.get(username.toLowerCase()).length > 0;
-		console.log(trie.get(username.toLowerCase()));
+		console.log(names);
 
 		if (matches) {
 			await member.roles.add(config.flagRole);
