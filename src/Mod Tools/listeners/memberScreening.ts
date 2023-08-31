@@ -13,6 +13,7 @@ import config from '../config.json';
 import csvParser from 'csv-parser';
 import { createReadStream } from 'fs';
 import trieSearch from 'trie-search';
+import path from 'path';
 
 interface CsvRow {
 	'Year of Birth': string;
@@ -38,7 +39,7 @@ export class UserEvent extends Listener {
 			);
 
 		const names: string[] = [];
-		createReadStream('../lib/Popular_Baby_Names.csv')
+		createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv'))
 			.pipe(csvParser())
 			.on('data', (row: CsvRow) => {
 				if (row["Child's First Name"]) {
