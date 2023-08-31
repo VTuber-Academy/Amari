@@ -10,19 +10,7 @@ import {
 	ButtonStyle
 } from 'discord.js';
 import config from '../config.json';
-import csvParser from 'csv-parser';
-import { createReadStream } from 'fs';
-import trieSearch from 'trie-search';
-import path from 'path';
-
-interface CsvRow {
-	'Year of Birth': string;
-	Gender: string;
-	Ethnicity: string;
-	"Child's First Name": string;
-	Count: string;
-	Rank: string;
-}
+import CEName from './modToolsPreload';
 
 @ApplyOptions<Listener.Options>({
 	name: 'Member Screening',
@@ -38,15 +26,13 @@ export class UserEvent extends Listener {
 				`Did not screen @${member.user.username}, couldn't find staff channel ${config.staffNotificationChannel}`
 			);
 
-		const names = await this.parseNames();
+		if (CEName.length === 0) {
+			return staffChannel.send(`Cannot screen ${member} because CEName is still loading...`);
+		}
 
-		const trie = new trieSearch('name');
-		trie.addAll(names.map((name) => ({ name: name.toLowerCase() })));
+		const regex = new RegExp(CEName.join('|'), 'i');
 
-		const matches = trie.get(username.toLowerCase()).length > 0;
-		console.log(names);
-
-		if (matches) {
+		if (username.match(regex)) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
@@ -90,27 +76,5 @@ export class UserEvent extends Listener {
 
 			staffChannel?.send({ embeds: [notificationEmbed], components: [staffActionRow] });
 		}
-	}
-
-	private async parseNames() {
-		return new Promise((resolve, reject) => {
-    const names: string[] = [];
-    const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv'))
-      .pipe(csvParser());
-
-    stream.on('data', (row: CsvRow) => {
-      if (row["Child's First Name"]) {
-        names.push(row["Child's First Name"]);
-      }
-    });
-
-    stream.on('end', () => {
-      resolve(names);
-    });
-
-    stream.on('error', (error) => {
-      reject(error);
-    });
-  });
 	}
 }

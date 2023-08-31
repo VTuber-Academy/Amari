@@ -65,9 +65,6 @@ dependencies:
   node-emoji:
     specifier: ^2.1.0
     version: 2.1.0
-  trie-search:
-    specifier: ^1.4.2
-    version: 1.4.2
 
 devDependencies:
   '@sapphire/cli':
@@ -2228,12 +2225,6 @@ packages:
     dependencies:
       function-bind: 1.1.1
 
-  /hasharray@1.1.2:
-    resolution: {integrity: sha512-7w3idwaVXX9gL9LiTCBSNKRGTBcp2WI/kf13UYeZ9+trOGBHVYHei6qtMY6DVnwGOouVUSRg0+L2xf4Q2/CmzA==}
-    dependencies:
-      jclass: 1.2.1
-    dev: false
-
   /hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
     dev: true
@@ -2501,11 +2492,6 @@ packages:
       html-escaper: 2.0.2
       istanbul-lib-report: 3.0.0
     dev: true
-
-  /jclass@1.2.1:
-    resolution: {integrity: sha512-mRx8uv1qJLOtxbRf3IWOQIH2ro7VIPn6ZkhbTcUJvJEslLzYA7BSATXDi/GR1yKYV9DASsjTZL+0YJPdqSMznw==}
-    engines: {node: '>= 0.6'}
-    dev: false
 
   /js-string-escape@1.0.1:
     resolution: {integrity: sha512-Smw4xcfIQ5LVjAOuJCvN/zIodzA/BBSsluuoSykP+lUvScIi4U6RJLfwHet5cxFnCswUjISV8oAXaqaJDY3chg==}
@@ -3794,12 +3780,6 @@ packages:
     engines: {node: '>=12'}
     dependencies:
       punycode: 2.3.0
-    dev: false
-
-  /trie-search@1.4.2:
-    resolution: {integrity: sha512-dkZ5qQabfwtLzDj34sIBz/zqTI3q4jG5Aa2Eaq7kW3btjRoM7o3HP7gX0ANgMSiefLAx1qlyr0X3OMf9ZuCWAA==}
-    dependencies:
-      hasharray: 1.1.2
     dev: false
 
   /trim-repeated@2.0.0:
