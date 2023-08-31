@@ -32,7 +32,7 @@ export class UserEvent extends Listener {
 
 		const regex = new RegExp(CEName.join('|'), 'i');
 
-		if (username.match(regex)) {
+		if (username.match(regex).length > 0) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
