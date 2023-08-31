@@ -11,6 +11,7 @@ import {
 } from 'discord.js';
 import config from '../config.json';
 import { createReadStream } from 'fs';
+import path from 'path';
 
 @ApplyOptions<Listener.Options>({
 	name: 'Member Screening',
