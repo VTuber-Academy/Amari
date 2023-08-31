@@ -4,12 +4,10 @@
 			"syntax": "typescript",
 			"decorators": true
 		},
-		"target": "es2020",
-		"baseUrl": "./src"
+		"target": "es2020"
 	},
 
 	"module": {
 		"type": "commonjs"
-	},
-	"minify": false
+	}
 }

@@ -3,6 +3,10 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"outDir": "dist",
+		"baseUrl": "src",
+		"paths": {
+			"amariSource": ["./src/*"]
+		},
 		"tsBuildInfoFile": "dist/.tsbuildinfo"
 	},
 	"include": ["src"]
