@@ -12,6 +12,16 @@ import {
 import config from '../config.json';
 import { createReadStream } from 'fs';
 import path from 'path';
+import csvParser from 'csv-parser';
+
+interface namesRow {
+	'Year of Birth': string;
+	Gender: string;
+	Ethnicity: string;
+	"Child's First Name": string;
+	Count: string;
+	Rank: string;
+}
 
 @ApplyOptions<Listener.Options>({
 	name: 'Member Screening',
@@ -27,8 +37,7 @@ export class UserEvent extends Listener {
 				`Did not screen @${member.user.username}, couldn't find staff channel ${config.staffNotificationChannel}`
 			);
 
-const CEName = await this.parseNames() as string[];
-
+		const CEName = (await this.parseNames()) as string[];
 
 		if (CEName.length === 0) {
 			return staffChannel.send(`Cannot screen ${member} because CEName is still loading...`);
@@ -36,7 +45,7 @@ const CEName = await this.parseNames() as string[];
 
 		const regex = new RegExp(CEName.join('|'), 'i');
 
-		if (username.match(regex).length > 0) {
+		if (username.match(regex)) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
@@ -82,7 +91,7 @@ const CEName = await this.parseNames() as string[];
 		}
 	}
 
-		private async parseNames() {
+	private async parseNames() {
 		return new Promise((resolve, reject) => {
 			const names: string[] = [];
 			const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv')).pipe(csvParser());
@@ -101,5 +110,5 @@ const CEName = await this.parseNames() as string[];
 				reject(error);
 			});
 		});
-	}		      
+	}
 }
