@@ -38,15 +38,7 @@ export class UserEvent extends Listener {
 				`Did not screen @${member.user.username}, couldn't find staff channel ${config.staffNotificationChannel}`
 			);
 
-		const names: string[] = [];
-		const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv'))
-			.pipe(csvParser());
-
-		stream.on('data', (row: CsvRow) => {
-				if (row["Child's First Name"]) {
-					names.push(row["Child's First Name"]);
-				}
-			});
+		const names = await this.parseNames();
 
 		const trie = new trieSearch('name');
 		trie.addAll(names.map((name) => ({ name: name.toLowerCase() })));
@@ -98,5 +90,27 @@ export class UserEvent extends Listener {
 
 			staffChannel?.send({ embeds: [notificationEmbed], components: [staffActionRow] });
 		}
+	}
+
+	private async parseNames() {
+		return new Promise((resolve, reject) => {
+    const names: string[] = [];
+    const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv'))
+      .pipe(csvParser());
+
+    stream.on('data', (row: CsvRow) => {
+      if (row["Child's First Name"]) {
+        names.push(row["Child's First Name"]);
+      }
+    });
+
+    stream.on('end', () => {
+      resolve(names);
+    });
+
+    stream.on('error', (error) => {
+      reject(error);
+    });
+  });
 	}
 }
