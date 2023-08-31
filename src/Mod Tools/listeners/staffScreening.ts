@@ -18,7 +18,7 @@ export class UserEvent extends Listener {
 
 		const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
-		if (args[1] === 'approve') {
+		if (args[2] === 'approve') {
 			actionRow.setComponents(
 				new ButtonBuilder()
 					.setDisabled(true)
