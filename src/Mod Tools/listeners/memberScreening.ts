@@ -10,7 +10,6 @@ import {
 	ButtonStyle
 } from 'discord.js';
 import config from '../config.json';
-import CEName from './modToolsPreload';
 
 @ApplyOptions<Listener.Options>({
 	name: 'Member Screening',
@@ -25,6 +24,9 @@ export class UserEvent extends Listener {
 			return this.container.logger.warn(
 				`Did not screen @${member.user.username}, couldn't find staff channel ${config.staffNotificationChannel}`
 			);
+
+const CEName = await this.parseNames() as string[];
+
 
 		if (CEName.length === 0) {
 			return staffChannel.send(`Cannot screen ${member} because CEName is still loading...`);
@@ -77,4 +79,25 @@ export class UserEvent extends Listener {
 			staffChannel?.send({ embeds: [notificationEmbed], components: [staffActionRow] });
 		}
 	}
+
+		private async parseNames() {
+		return new Promise((resolve, reject) => {
+			const names: string[] = [];
+			const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv')).pipe(csvParser());
+
+			stream.on('data', (row: namesRow) => {
+				if (row["Child's First Name"]) {
+					names.push(row["Child's First Name"]);
+				}
+			});
+
+			stream.on('end', () => {
+				resolve(names);
+			});
+
+			stream.on('error', (error: any) => {
+				reject(error);
+			});
+		});
+	}		      
 }
