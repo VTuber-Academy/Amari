@@ -47,7 +47,7 @@ export class UserCommand extends Command {
 					new ButtonBuilder().setCustomId(`screen|${member.id}|reject`).setEmoji('❌').setLabel('Ban').setStyle(ButtonStyle.Secondary)
 				);
 
-				interaction.channel?.send({
+				await interaction.channel?.send({
 					content: `VTA Bot found ${member} suspicious`,
 					components: [actionRow]
 				});
