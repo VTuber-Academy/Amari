@@ -29,7 +29,7 @@ export class UserEvent extends Listener {
 			);
 
 			await interaction.update({ components: [actionRow] });
-			return member.roles.remove(config.flagRole);
+			return member.roles.remove(config.flagRole).catch(() => null);
 		} else {
 			actionRow.setComponents(
 				new ButtonBuilder()
