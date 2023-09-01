@@ -43,7 +43,7 @@ export class UserCommand extends Command {
 		const channel = interaction.channel;
 		if (!channel) return;
 
-		members.forEach(async (member) => {
+		return members.forEach(async (member) => {
 			if (member.user.username.match(regex)) {
 				const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
 					new ButtonBuilder().setCustomId(`screen|${member.id}|approve`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
@@ -58,8 +58,6 @@ export class UserCommand extends Command {
 
 			interaction.client.logger.info(`Scanned ${member.user.username}`);
 		});
-
-		return;
 	}
 
 	private async parseNames() {
