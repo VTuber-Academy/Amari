@@ -40,6 +40,9 @@ export class UserCommand extends Command {
 			ephemeral: true
 		});
 
+		const channel = interaction.channel;
+		if (!channel) return;
+
 		members.forEach(async (member) => {
 			if (member.user.username.match(regex)) {
 				const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -47,7 +50,7 @@ export class UserCommand extends Command {
 					new ButtonBuilder().setCustomId(`screen|${member.id}|reject`).setEmoji('❌').setLabel('Ban').setStyle(ButtonStyle.Secondary)
 				);
 
-				await interaction.channel?.send({
+				channel.send({
 					content: `VTA Bot found ${member} suspicious`,
 					components: [actionRow]
 				});
