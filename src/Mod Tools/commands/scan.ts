@@ -28,7 +28,7 @@ export class UserCommand extends Command {
 	}
 
 	public override async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		const members = interaction.guild?.members.cache;
+		const members = await interaction.guild?.members.fetch();
 		if (!members) return interaction.reply({ content: 'Members not cached!', ephemeral: true });
 
 		const commonNames = (await this.parseNames()) as string[];
