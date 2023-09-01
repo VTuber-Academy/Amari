@@ -52,6 +52,8 @@ export class UserCommand extends Command {
 					components: [actionRow]
 				});
 			}
+
+			interaction.client.logger.info(`Scanned ${member.user.username}`);
 		});
 
 		return;
