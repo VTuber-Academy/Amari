@@ -53,7 +53,7 @@ export class UserEvent extends Listener {
 			userNameMatch = true;
 		}
 
-		if (member.user.createdTimestamp - Math.floor(new Date().getTime() / 1000) < new Duration('6 months').offset) {
+		if (member.user.createdTimestamp - Math.floor(new Date().getTime() / 1000) > new Duration('6 months').offset) {
 			discordAccountCreation = true;
 		}
 
@@ -72,6 +72,11 @@ export class UserEvent extends Listener {
 					"Welcome to the VTA! You have been automatically flagged by CENtrie and will undergo manual screening by one of our staff members. Do not worry, this won't take long!\n\nCentrie is VTA's security bot looking out for potentially malicious profiles and every process is automatic while being under the supervision of a staff member."
 				)
 				.setTimestamp();
+
+			notificationEmbed.addFields(
+				{ name: 'Username Match', value: `${userNameMatch ? '⚠️ Username is a common english name' : '✅ Username is not common'}` },
+				{ name: 'Account Age', value: discordAccountCreation ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
+			);
 
 			await member.send({ embeds: [notificationEmbed] }).then(
 				() => {
