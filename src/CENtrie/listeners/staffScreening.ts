@@ -53,7 +53,7 @@ export class UserEvent extends Listener {
 				.setTimestamp();
 
 			await interaction.update({ components: [actionRow], content: '', embeds: [notificationEmbed] });
-			return interaction.guild?.bans.create(member, {
+			return interaction.guild?.bans.create(member.id, {
 				reason: `Suspicious or spam account\nMod: @${interaction.user.username} (${interaction.user.id})`
 			});
 		}
