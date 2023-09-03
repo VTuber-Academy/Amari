@@ -13,6 +13,7 @@ import config from '../config.json';
 import { createReadStream } from 'fs';
 import path from 'path';
 import csvParser from 'csv-parser';
+import { Duration } from '@sapphire/time-utilities';
 
 interface namesRow {
 	'Year of Birth': string;
@@ -40,12 +41,23 @@ export class UserEvent extends Listener {
 		const CEName = (await this.parseNames()) as string[];
 
 		if (CEName.length === 0) {
-			return staffChannel.send(`Cannot screen ${member} because CEName is still loading...`);
+			return staffChannel.send(`Cannot screen ${member} because Centrie is still loading...`);
 		}
 
 		const regex = new RegExp(CEName.join('|'), 'i');
 
+		let userNameMatch = false;
+		let discordAccountCreation = false;
+
 		if (username.match(regex)) {
+			userNameMatch = true;
+		}
+
+		if (member.user.createdTimestamp - Math.floor(new Date().getTime() / 1000) < new Duration('6 months').offset) {
+			discordAccountCreation = true;
+		}
+
+		if (userNameMatch && !discordAccountCreation) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
@@ -55,9 +67,9 @@ export class UserEvent extends Listener {
 
 			const notificationEmbed = new EmbedBuilder()
 				.setColor('Red')
-				.setTitle('🤚 Abnormal Profile Behaviour Detected!')
+				.setTitle('🤚 CENTRIE has halted an activity')
 				.setDescription(
-					"You have been automatically flagged by VTA Bot and will undergo manual screening by one of our staff members. Do not worry, this won't take long!"
+					"Welcome to the VTA! You have been automatically flagged by CENtrie and will undergo manual screening by one of our staff members. Do not worry, this won't take long!\n\nCentrie is VTA's security bot looking out for potentially malicious profiles and every process is automatic while being under the supervision of a staff member."
 				)
 				.setTimestamp();
 
@@ -70,7 +82,7 @@ export class UserEvent extends Listener {
 				}
 			);
 
-			notificationEmbed.setDescription(`VTA Bot has flagged ${member} from interacting within the server.`);
+			notificationEmbed.setDescription(`${member} has been caught by CENtrie and is waiting for a staff member to screen them.`);
 
 			return staffChannel.send({
 				embeds: [notificationEmbed],
@@ -79,11 +91,17 @@ export class UserEvent extends Listener {
 		} else {
 			const notificationEmbed = new EmbedBuilder()
 				.setColor('Green')
-				.setTitle('✅ Automatic Screening shows no errors')
-				.setDescription(`${member} has passed VTA's automatic screening process`)
+				.setTitle('✅ CENtrie allowed a member')
+				.setDescription(`${member} does not meet the defined security criteria`)
 				.setTimestamp();
 
+			notificationEmbed.addFields(
+				{ name: 'Username Match', value: `${userNameMatch ? '⚠️ Username is a common english name' : '✅ Username is not common'}` },
+				{ name: 'Account Age', value: discordAccountCreation ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
+			);
+
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+				new ButtonBuilder().setCustomId(`screen|${member.id}|approve`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
 				new ButtonBuilder().setCustomId(`screen|${member.id}|reject`).setEmoji('❌').setLabel('Ban').setStyle(ButtonStyle.Secondary)
 			);
 

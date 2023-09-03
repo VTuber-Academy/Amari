@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import { ActionRowBuilder, type MessageActionRowComponentBuilder, type Interaction, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ActionRowBuilder, type MessageActionRowComponentBuilder, type Interaction, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import config from '../config.json';
 
 @ApplyOptions<Listener.Options>({
@@ -28,7 +28,13 @@ export class UserEvent extends Listener {
 					.setStyle(ButtonStyle.Success)
 			);
 
-			await interaction.update({ components: [actionRow] });
+			const notificationEmbed = new EmbedBuilder()
+				.setColor('Green')
+				.setTitle('✅ Case Resolved')
+				.setDescription(`${member} was allowed into the server by ${interaction.member}`)
+				.setTimestamp();
+
+			await interaction.update({ components: [actionRow], content: '', embeds: [notificationEmbed] });
 			return member.roles.remove(config.flagRole).catch(() => null);
 		} else {
 			actionRow.setComponents(
@@ -40,7 +46,13 @@ export class UserEvent extends Listener {
 					.setStyle(ButtonStyle.Danger)
 			);
 
-			await interaction.update({ components: [actionRow] });
+			const notificationEmbed = new EmbedBuilder()
+				.setColor('Red')
+				.setTitle('✅ Case Resolved')
+				.setDescription(`${member} has been banned by ${interaction.member}`)
+				.setTimestamp();
+
+			await interaction.update({ components: [actionRow], content: '', embeds: [notificationEmbed] });
 			return interaction.guild?.bans.create(member, {
 				reason: `Suspicious or spam account\nMod: @${interaction.user.username} (${interaction.user.id})`
 			});
