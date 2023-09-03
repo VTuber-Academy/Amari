@@ -13,12 +13,12 @@ export class UserEvent extends Listener {
 		const args = interaction.customId.split('|');
 		if (args[0] !== 'screen') return;
 
-		const member = await interaction.guild?.members.fetch(args[1]);
-		if (!member) return interaction.reply({ content: 'Could not find member', ephemeral: true });
-
 		const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
 		if (args[2] === 'approve') {
+			const member = await interaction.guild?.members.fetch(args[1]);
+			if (!member) return interaction.reply({ content: 'Could not find member', ephemeral: true });
+
 			actionRow.setComponents(
 				new ButtonBuilder()
 					.setDisabled(true)
@@ -49,11 +49,11 @@ export class UserEvent extends Listener {
 			const notificationEmbed = new EmbedBuilder()
 				.setColor('Red')
 				.setTitle('✅ Case Resolved')
-				.setDescription(`${member} has been banned by ${interaction.member}`)
+				.setDescription(`<@${args[1]}> has been banned by ${interaction.member}`)
 				.setTimestamp();
 
 			await interaction.update({ components: [actionRow], content: '', embeds: [notificationEmbed] });
-			return interaction.guild?.bans.create(member.id, {
+			return interaction.guild?.bans.create(args[1], {
 				reason: `Suspicious or spam account\nMod: @${interaction.user.username} (${interaction.user.id})`
 			});
 		}
