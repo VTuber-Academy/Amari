@@ -1,4 +1,8 @@
 {
 	"flagRole": "1146326445245870212",
-	"staffNotificationChannel": "747486764834357391"
+	"staffNotificationChannel": "747486764834357391",
+	"ready": {
+		"notificationChan": "747485611409145889",
+		"notificationServ": "747485611409145889"
+	}
 }
