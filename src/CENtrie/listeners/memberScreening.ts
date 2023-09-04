@@ -53,7 +53,7 @@ export class UserEvent extends Listener {
 			userNameMatch = true;
 		}
 
-		if (member.user.createdTimestamp - Math.floor(new Date().getTime() / 1000) > new Duration('6 months').offset) {
+		if (member.user.createdTimestamp - new Date().getTime() > new Duration('6 months').offset) {
 			discordAccountCreation = true;
 		}
 

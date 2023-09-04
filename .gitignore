@@ -29,3 +29,6 @@ package-lock.json
 .env.test.local
 .env.production.local
 src/.env
+
+# Blacklist commands and files meant for testing
+*.test.ts
