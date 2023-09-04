@@ -15,7 +15,7 @@ export class UserEvent extends Listener {
 		const member = await server?.members.fetch(levelDB.id);
 		if (!member) return;
 
-		if (levelDB.level === 1) {
+		if (!member.roles.cache.has('759085739723456563')) {
 			const nEmbed = new EmbedBuilder()
 				.setColor('Yellow')
 				.setTitle('We officially welcome you to the VTA!')
