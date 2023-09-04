@@ -11,7 +11,7 @@ import {
 } from 'discord.js';
 import config from '../config.json';
 import { createReadStream } from 'fs';
-import path from 'path';
+import path, { join } from 'path';
 import csvParser from 'csv-parser';
 import { Duration } from '@sapphire/time-utilities';
 
@@ -53,11 +53,13 @@ export class UserEvent extends Listener {
 			userNameMatch = true;
 		}
 
-		if (member.user.createdTimestamp - new Date().getTime() > new Duration('6 months').offset) {
+		const joinDuration = member.user.createdTimestamp - new Date().getTime();
+
+		if (joinDuration > new Duration('6 months').offset) {
 			discordAccountCreation = true;
 		}
 
-		if (userNameMatch && !discordAccountCreation) {
+		if ((userNameMatch && !discordAccountCreation) || joinDuration > new Duration('1 month').offset) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
