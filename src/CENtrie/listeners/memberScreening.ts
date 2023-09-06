@@ -59,7 +59,7 @@ export class UserEvent extends Listener {
 			discordAccountCreation = true;
 		}
 
-		if ((userNameMatch && !discordAccountCreation) || joinDuration > new Duration('1 month').offset) {
+		if ((userNameMatch && !discordAccountCreation) || joinDuration < new Duration('1 month').offset) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
