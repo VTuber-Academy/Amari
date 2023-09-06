@@ -72,7 +72,7 @@ export class UserCommand extends Subcommand {
 
 		const logs = [] as string[];
 		messages.forEach((message) => {
-			logs.push(`[${message.author}] [${message.createdTimestamp}] ${message.content}`);
+			logs.push(`[@${message.author.username}] [${message.createdTimestamp}] ${message.content}`);
 
 			message.attachments.forEach((attachment) => {
 				logs.push(`[@${message.author.username}] [${message.createdTimestamp}] ATTACHMENT: ${attachment.contentType} - ${attachment.url}`);
