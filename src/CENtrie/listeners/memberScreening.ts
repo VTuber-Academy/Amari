@@ -14,6 +14,11 @@ import { createReadStream } from 'fs';
 import path from 'path';
 import csvParser from 'csv-parser';
 
+interface memberFlagInterface {
+	isFlagged: boolean;
+	reasons?: string[];
+}
+
 interface namesRow {
 	'Year of Birth': string;
 	Gender: string;
@@ -29,6 +34,8 @@ interface namesRow {
 })
 export class UserEvent extends Listener {
 	public override async run(member: GuildMember) {
+		const flag: memberFlagInterface = { isFlagged: false, reasons: [] };
+
 		const username = member.user.username;
 		const staffChannel = (await member.guild.channels.fetch(config.staffNotificationChannel)) as TextChannel | null;
 
@@ -45,25 +52,33 @@ export class UserEvent extends Listener {
 
 		const regex = new RegExp(CEName.join('|'), 'i');
 
-		let userNameMatch = false;
-
-		if (username.match(regex)) {
-			userNameMatch = true;
-		}
-
 		const sixMonthsAgo = new Date();
 		sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
 		const oneMonthAgo = new Date();
 		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-		let didNotMeetCreationRequirement = member.user.createdAt > sixMonthsAgo;
+		if (username.match(regex) && member.user.createdAt < sixMonthsAgo) {
+			flag.isFlagged = true;
+			flag.reasons?.push(`❗ Username matches our filters and account age is less than 6 months`);
+		} else {
+			if (member.user.createdAt < sixMonthsAgo) {
+				flag.reasons?.push('✅ Username matching skipped, account age higher than six months');
+			} else {
+				flag.reasons?.push("⚠️ Username doesn't match but account age created within six months");
+			}
+		}
 
-		if ((userNameMatch && didNotMeetCreationRequirement) || member.user.createdAt > oneMonthAgo) {
+		if (member.user.createdAt < oneMonthAgo) {
+			flag.isFlagged = true;
+			flag.reasons?.push('❗ Account age less than six months');
+		}
+
+		if (flag.isFlagged) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-				new ButtonBuilder().setCustomId(`screen|${member.id}|approve`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
+				new ButtonBuilder().setCustomId(`screen|${member.id}|approve|yes`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
 				new ButtonBuilder().setCustomId(`screen|${member.id}|reject`).setEmoji('❌').setLabel('Ban').setStyle(ButtonStyle.Secondary)
 			);
 
@@ -75,10 +90,7 @@ export class UserEvent extends Listener {
 				)
 				.setTimestamp();
 
-			notificationEmbed.addFields(
-				{ name: 'Username Match', value: `${userNameMatch ? '⚠️ Username is a common english name' : '✅ Username is not common'}` },
-				{ name: 'Account Age', value: didNotMeetCreationRequirement ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
-			);
+			notificationEmbed.addFields({ name: 'Reasons', value: `${flag.reasons?.join(`\n`)}` });
 
 			await member.send({ embeds: [notificationEmbed] }).then(
 				() => {
@@ -96,19 +108,12 @@ export class UserEvent extends Listener {
 				components: [staffActionRow]
 			});
 		} else {
-			const notificationEmbed = new EmbedBuilder()
-				.setColor('Green')
-				.setTitle('✅ CENtrie allowed a member')
-				.setDescription(`${member} does not meet the defined security criteria`)
-				.setTimestamp();
+			const notificationEmbed = new EmbedBuilder().setColor('Green').setTitle('✅ CENtrie allowed a member').setTimestamp();
 
-			notificationEmbed.addFields(
-				{ name: 'Username Match', value: `${userNameMatch ? '⚠️ Username is a common english name' : '✅ Username is not common'}` },
-				{ name: 'Account Age', value: didNotMeetCreationRequirement ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
-			);
+			notificationEmbed.addFields({ name: 'Reasons', value: `${flag.reasons?.join(`\n`)}` });
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-				new ButtonBuilder().setCustomId(`screen|${member.id}|approve`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
+				new ButtonBuilder().setCustomId(`screen|${member.id}|approve|no`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
 				new ButtonBuilder().setCustomId(`screen|${member.id}|reject`).setEmoji('❌').setLabel('Ban').setStyle(ButtonStyle.Secondary)
 			);
 
