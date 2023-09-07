@@ -11,9 +11,8 @@ import {
 } from 'discord.js';
 import config from '../config.json';
 import { createReadStream } from 'fs';
-import path, { join } from 'path';
+import path from 'path';
 import csvParser from 'csv-parser';
-import { Duration } from '@sapphire/time-utilities';
 
 interface namesRow {
 	'Year of Birth': string;
@@ -47,19 +46,20 @@ export class UserEvent extends Listener {
 		const regex = new RegExp(CEName.join('|'), 'i');
 
 		let userNameMatch = false;
-		let discordAccountCreation = false;
 
 		if (username.match(regex)) {
 			userNameMatch = true;
 		}
 
-		const joinDuration = member.user.createdTimestamp - new Date().getTime();
+		const sixMonthsAgo = new Date();
+		sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-		if (joinDuration > new Duration('6 months').offset) {
-			discordAccountCreation = true;
-		}
+		const oneMonthAgo = new Date();
+		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-		if ((userNameMatch && !discordAccountCreation) || joinDuration < new Duration('1 month').offset) {
+		let didNotMeetCreationRequirement = member.user.createdAt > sixMonthsAgo;
+
+		if ((userNameMatch && didNotMeetCreationRequirement) || member.user.createdAt > oneMonthAgo) {
 			await member.roles.add(config.flagRole);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
@@ -77,7 +77,7 @@ export class UserEvent extends Listener {
 
 			notificationEmbed.addFields(
 				{ name: 'Username Match', value: `${userNameMatch ? '⚠️ Username is a common english name' : '✅ Username is not common'}` },
-				{ name: 'Account Age', value: discordAccountCreation ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
+				{ name: 'Account Age', value: didNotMeetCreationRequirement ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
 			);
 
 			await member.send({ embeds: [notificationEmbed] }).then(
@@ -104,7 +104,7 @@ export class UserEvent extends Listener {
 
 			notificationEmbed.addFields(
 				{ name: 'Username Match', value: `${userNameMatch ? '⚠️ Username is a common english name' : '✅ Username is not common'}` },
-				{ name: 'Account Age', value: discordAccountCreation ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
+				{ name: 'Account Age', value: didNotMeetCreationRequirement ? '✅ Account is old' : '⚠️ Account age is too low (minimum 6 months)' }
 			);
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
