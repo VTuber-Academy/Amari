@@ -117,6 +117,8 @@ export class UserEvent extends Listener {
 				new ButtonBuilder().setCustomId(`screen|${member.id}|reject`).setEmoji('❌').setLabel('Ban').setStyle(ButtonStyle.Secondary)
 			);
 
+			notificationEmbed.setDescription(`${member} has been scanned by CENtrie and doesn't show any errors.`);
+
 			staffChannel?.send({ embeds: [notificationEmbed], components: [staffActionRow] });
 		}
 	}
