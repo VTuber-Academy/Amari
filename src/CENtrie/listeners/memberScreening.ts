@@ -58,7 +58,7 @@ export class UserEvent extends Listener {
 		const oneMonthAgo = new Date();
 		oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
-		if (username.match(regex) && member.user.createdAt < sixMonthsAgo) {
+		if (username.match(regex) && member.user.createdAt > sixMonthsAgo) {
 			flag.isFlagged = true;
 			flag.reasons?.push(`❗ Username matches our filters and account age is less than 6 months`);
 		} else {
@@ -69,9 +69,9 @@ export class UserEvent extends Listener {
 			}
 		}
 
-		if (member.user.createdAt < oneMonthAgo) {
+		if (member.user.createdAt > oneMonthAgo) {
 			flag.isFlagged = true;
-			flag.reasons?.push('❗ Account age less than six months');
+			flag.reasons?.push('❗ Account age less than one month');
 		}
 
 		if (flag.isFlagged) {
