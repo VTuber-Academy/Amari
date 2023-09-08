@@ -45,8 +45,8 @@ dependencies:
     specifier: ^1.2.0
     version: 1.2.0
   canvacord:
-    specifier: github:VTuber-Academy/canvacord
-    version: git@github.com+VTuber-Academy/canvacord/6389481a65fb405acd2ec5e402a0a3b642e97557
+    specifier: git@github.com:VTuber-Academy/canvacord.git
+    version: github.com/VTuber-Academy/canvacord/6389481a65fb405acd2ec5e402a0a3b642e97557
   colorette:
     specifier: ^2.0.20
     version: 2.0.20
@@ -4084,8 +4084,8 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  git@github.com+VTuber-Academy/canvacord/6389481a65fb405acd2ec5e402a0a3b642e97557:
-    resolution: {commit: 6389481a65fb405acd2ec5e402a0a3b642e97557, repo: git@github.com:VTuber-Academy/canvacord.git, type: git}
+  github.com/VTuber-Academy/canvacord/6389481a65fb405acd2ec5e402a0a3b642e97557:
+    resolution: {tarball: https://codeload.github.com/VTuber-Academy/canvacord/tar.gz/6389481a65fb405acd2ec5e402a0a3b642e97557}
     name: canvacord
     version: 5.4.10
     hasBin: true

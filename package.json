@@ -19,7 +19,7 @@
 		"@sapphire/type": "^2.4.0",
 		"@sapphire/utilities": "^3.11.1",
 		"@skyra/env-utilities": "^1.2.0",
-		"canvacord": "github:VTuber-Academy/canvacord",
+		"canvacord": "git@github.com:VTuber-Academy/canvacord.git",
 		"colorette": "^2.0.20",
 		"csv-parser": "^3.0.0",
 		"discord.js": "^14.10.2",
