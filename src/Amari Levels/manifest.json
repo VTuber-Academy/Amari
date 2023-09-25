@@ -1,0 +1,15 @@
+{
+	"Name": "Amari Level System",
+	"Description": "Handles community rank!",
+	"Version": 1.0,
+	"configurationProfiles": {
+		"development": {
+			"messageCooldown": "10 seconds",
+			"IgnoreChannels": []
+		},
+		"production": {
+			"messageCooldown": "1 minute",
+			"IgnoreChannels": ["1103870663195889705", "1103870686092595200", "1103870709157085204"]
+		}
+	}
+}
