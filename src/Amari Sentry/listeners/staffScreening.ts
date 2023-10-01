@@ -2,6 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
 import { ActionRowBuilder, type MessageActionRowComponentBuilder, type Interaction, ButtonBuilder, ButtonStyle } from 'discord.js';
 import config from '../config.json';
+import { Duration, TimerManager } from '@sapphire/time-utilities';
 
 @ApplyOptions<Listener.Options>({
 	name: 'Manual Staff Screening',
@@ -16,7 +17,7 @@ export class UserEvent extends Listener {
 		const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
 		if (args[2] === 'approve') {
-			const member = await interaction.guild?.members.fetch(args[1]);
+			const member = await interaction.guild?.members.fetch(args[1]).catch(() => undefined);
 			if (!member) return interaction.reply({ content: 'Could not find member', ephemeral: true });
 
 			actionRow.setComponents(
@@ -29,6 +30,14 @@ export class UserEvent extends Listener {
 			);
 
 			await interaction.update({ components: [actionRow] });
+
+			TimerManager.setTimeout(() => {
+				interaction.channel?.send({
+					content:
+						'It has been 24 hours since this member has been approved by a staff, check up on them if they need assistance navigating in the server!',
+					embeds: interaction.message.embeds
+				});
+			}, new Duration('1 day').offset);
 
 			return member.roles.remove(config.flagRole).catch(() => null);
 		} else {

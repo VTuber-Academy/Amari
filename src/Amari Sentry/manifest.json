@@ -1,0 +1,23 @@
+{
+	"Name": "Amari Sentry",
+	"Description": "Screens members upon join",
+	"Version": 1.0,
+	"configurationProfiles": {
+		"production": {
+			"flagRole": "1146326445245870212",
+			"staffNotificationChannel": "747486764834357391",
+			"ready": {
+				"notificationChan": "747485611409145889",
+				"notificationServ": "747485611409145889"
+			}
+		},
+		"development": {
+			"flagRole": "1155362562494435378",
+			"staffNotificationChannel": "1155362563245232221",
+			"ready": {
+				"notificationChan": "1155362563245232221",
+				"notificationServ": "1155362562444103690"
+			}
+		}
+	}
+}

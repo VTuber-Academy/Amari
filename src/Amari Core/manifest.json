@@ -1,0 +1,9 @@
+{
+	"Name": "Amari core",
+	"Description": "All core features necessary for initialization",
+	"Version": 1.0,
+	"configurationProfiles": {
+		"development": {},
+		"production": {}
+	}
+}

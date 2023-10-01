@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
 import { ChannelType, type Message } from 'discord.js';
 import { Duration } from '@sapphire/duration';
-import config from '../levelConfig.json';
+import config from '../config.json';
 import levelManager from '../lib/levelManager';
 
 const cooldownMap = new Map<string, number>();
