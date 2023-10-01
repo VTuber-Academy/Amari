@@ -12,7 +12,7 @@ import express from 'express';
 const app = express();
 const port = 10000;
 
-interface pluginManifest {
+interface PluginManifest {
 	Name: string;
 	Version: number;
 	configurationProfiles: {
@@ -56,7 +56,7 @@ const main = async () => {
 		for (const [name, path] of Object.entries(modules)) {
 			try {
 				let pluginWorkingFolder = join(rootData.root, path);
-				let manifest: pluginManifest = JSON.parse(fs.readFileSync(join(pluginWorkingFolder, 'manifest.json'), 'utf-8'));
+				let manifest: PluginManifest = JSON.parse(fs.readFileSync(join(pluginWorkingFolder, 'manifest.json'), 'utf-8'));
 
 				const pluginConfig = JSON.stringify(manifest.configurationProfiles[process.env.NODE_ENV]);
 				fs.writeFileSync(join(pluginWorkingFolder, 'config.json'), pluginConfig, 'utf-8');

@@ -14,12 +14,12 @@ import { createReadStream } from 'fs';
 import path from 'path';
 import csvParser from 'csv-parser';
 
-interface memberFlagInterface {
+interface MemberFlagInterface {
 	isFlagged: boolean;
 	reasons?: string[];
 }
 
-interface namesRow {
+interface NamesRow {
 	'Year of Birth': string;
 	Gender: string;
 	Ethnicity: string;
@@ -34,7 +34,7 @@ interface namesRow {
 })
 export class UserEvent extends Listener {
 	public override async run(member: GuildMember) {
-		const flag: memberFlagInterface = { isFlagged: false, reasons: [] };
+		const flag: MemberFlagInterface = { isFlagged: false, reasons: [] };
 
 		const username = member.user.username;
 		const staffChannel = (await member.guild.channels.fetch(config.staffNotificationChannel)) as TextChannel | null;
@@ -61,12 +61,10 @@ export class UserEvent extends Listener {
 		if (username.match(regex) && member.user.createdAt > sixMonthsAgo) {
 			flag.isFlagged = true;
 			flag.reasons?.push(`❗ Username matches our filters and account age is less than 6 months`);
+		} else if (member.user.createdAt < sixMonthsAgo) {
+			flag.reasons?.push('✅ Username matching skipped, account age higher than six months');
 		} else {
-			if (member.user.createdAt < sixMonthsAgo) {
-				flag.reasons?.push('✅ Username matching skipped, account age higher than six months');
-			} else {
-				flag.reasons?.push("⚠️ Username doesn't match but account age created within six months");
-			}
+			flag.reasons?.push("⚠️ Username doesn't match but account age created within six months");
 		}
 
 		if (member.user.createdAt > oneMonthAgo) {
@@ -90,7 +88,7 @@ export class UserEvent extends Listener {
 				)
 				.setTimestamp();
 
-			notificationEmbed.addFields({ name: 'Reasons', value: `${flag.reasons?.join(`\n`)}` });
+			notificationEmbed.addFields({ name: 'Reasons', value: `${flag.reasons?.join('\n')}` });
 
 			await member.send({ embeds: [notificationEmbed] }).then(
 				() => {
@@ -110,7 +108,7 @@ export class UserEvent extends Listener {
 		} else {
 			const notificationEmbed = new EmbedBuilder().setColor('Green').setTitle('✅ CENtrie allowed a member').setTimestamp();
 
-			notificationEmbed.addFields({ name: 'Reasons', value: `${flag.reasons?.join(`\n`)}` });
+			notificationEmbed.addFields({ name: 'Reasons', value: `${flag.reasons?.join('\n')}` });
 
 			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
 				new ButtonBuilder().setCustomId(`screen|${member.id}|approve|no`).setEmoji('✅').setLabel('Approve').setStyle(ButtonStyle.Success),
@@ -128,7 +126,7 @@ export class UserEvent extends Listener {
 			const names: string[] = [];
 			const stream = createReadStream(path.join(__dirname, '../lib/Popular_Baby_Names.csv')).pipe(csvParser());
 
-			stream.on('data', (row: namesRow) => {
+			stream.on('data', (row: NamesRow) => {
 				if (row["Child's First Name"]) {
 					names.push(row["Child's First Name"]);
 				}
