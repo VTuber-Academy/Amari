@@ -15,6 +15,6 @@ export class UserEvent extends Listener {
 			.setTimestamp()
 			.setFields({ name: 'Reason', value: `${ban.reason}` });
 
-		return ban.user.send({ embeds: [embed] });
+		return ban.user.send({ embeds: [embed] }).catch(() => null);
 	}
 }
