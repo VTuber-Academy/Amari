@@ -98,39 +98,13 @@ export class UserEvent extends Listener {
 					if (response.data['eden-ai'].nsfw_likelihood === 5) {
 						screeningResults.isFlagged = true;
 					} else if (response.data['eden-ai'].nsfw_likelihood > 3) {
-						screeningResults.redFlags.push('[❗] Eden detects suggestive profile picture');
+						screeningResults.redFlags.push(
+							`[❗] Eden detects suggestive profile picture\n- NSFW Likelihood: ${response.data['eden-ai'].nsfw_likelihood} / 5`
+						);
 					}
 				},
 				(error) => {
 					staffChannel.send(`Cannot scan ${member}'s pfp with AI`);
-					console.log(error);
-				}
-			);
-
-			let nsfwBannerAPIoptions = {
-				method: 'POST',
-				url: 'https://api.edenai.run/v2/image/explicit_content',
-				headers: {
-					Authorization: `Bearer ${process.env.EdenAI}`
-				},
-				data: {
-					show_original_response: false,
-					fallback_providers: '',
-					providers: 'api4ai',
-					file_url: member.user.bannerURL({ extension: 'png', size: 128 })
-				}
-			};
-
-			await axios.request(nsfwBannerAPIoptions).then(
-				(response) => {
-					if (response.data['eden-ai'].nsfw_likelihood === 5) {
-						screeningResults.isFlagged = true;
-					} else if (response.data['eden-ai'].nsfw_likelihood > 3) {
-						screeningResults.redFlags.push('[❗] Eden detects suggestive banner picture');
-					}
-				},
-				(error) => {
-					staffChannel.send(`Cannot scan ${member}'s banner with AI`);
 					console.log(error);
 				}
 			);
