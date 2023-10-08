@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import levelDatabase from 'Amari Levels/lib/levelDataBase';
+import levelDatabase from '../lib/levelDataBase';
 import { GuildMember } from 'discord.js';
 
 @ApplyOptions<Listener.Options>({
