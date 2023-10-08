@@ -213,7 +213,9 @@ export class UserCommand extends Subcommand {
 		});
 	}
 
-	public async clearempty(interaction: Subcommand.ChatInputCommandInteraction) {
+	public async clearEmpty(interaction: Subcommand.ChatInputCommandInteraction) {
+		if (!interaction.memberPermissions?.has('Administrator'))
+			return interaction.reply({ content: 'you must be admin to use this cmd!', ephemeral: true });
 		await interaction.deferReply();
 
 		let deleted = 0;
@@ -225,6 +227,6 @@ export class UserCommand extends Subcommand {
 			});
 		});
 
-		await interaction.reply({ content: `Cleared ${deleted} database members!` });
+		return interaction.reply({ content: `Cleared ${deleted} database members!` });
 	}
 }
