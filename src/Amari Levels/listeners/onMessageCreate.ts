@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import { ChannelType, type Message } from 'discord.js';
+import { ChannelType, MessageType, type Message } from 'discord.js';
 import { Duration } from '@sapphire/duration';
 import config from '../config.json';
 import levelManager from '../lib/levelManager';
@@ -17,7 +17,8 @@ export class UserEvent extends Listener {
 			message.channel.type === ChannelType.DM ||
 			cooldownMap.has(message.author.id) ||
 			message.author.bot ||
-			config.IgnoreChannels.find((id) => id === message.channelId)
+			config.IgnoreChannels.find((id) => id === message.channelId) ||
+			message.type !== MessageType.Default
 		)
 			return;
 

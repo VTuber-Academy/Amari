@@ -25,6 +25,10 @@ import { Rank } from 'canvacord';
 		{
 			name: 'remove',
 			chatInputRun: 'removeCommand'
+		},
+		{
+			name: 'clearempty',
+			chatInputRun: 'clearEmpty'
 		}
 	]
 })
@@ -60,6 +64,7 @@ export class UserCommand extends Subcommand {
 						.setDescription("View a member's level rank")
 						.addUserOption((input) => input.setName('of').setDescription('The member to be audited'))
 				)
+				.addSubcommand((command) => command.setName('clearempty').setDescription('Clear members that are not in the server manually!'))
 		);
 	}
 
@@ -206,5 +211,20 @@ export class UserCommand extends Subcommand {
 		return interaction.editReply({
 			embeds: [leaderboardEmbed]
 		});
+	}
+
+	public async clearempty(interaction: Subcommand.ChatInputCommandInteraction) {
+		await interaction.deferReply();
+
+		let deleted = 0;
+
+		(await levelDatabase.find({})).forEach(async (levelDb) => {
+			await interaction.guild?.members.fetch(levelDb.id).catch(() => {
+				levelDb.deleteOne();
+				deleted += 1;
+			});
+		});
+
+		await interaction.reply({ content: `Cleared ${deleted} database members!` });
 	}
 }
