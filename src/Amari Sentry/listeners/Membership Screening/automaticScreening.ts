@@ -113,6 +113,17 @@ export class UserEvent extends Listener {
 				screeningResults.isFlagged = true;
 			}
 
+			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+				new ButtonBuilder()
+					.setCustomId(`screening-approve-${member.user.id}`)
+					.setLabel(`Approve ${member.displayName}`)
+					.setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId(`screening-reject-${member.user.id}`)
+					.setLabel(`Reject ${member.displayName}`)
+					.setStyle(ButtonStyle.Danger)
+			);
+
 			if (screeningResults.isFlagged) {
 				const flaggedEmbed = new EmbedBuilder()
 					.setColor('DarkRed')
@@ -137,17 +148,6 @@ export class UserEvent extends Listener {
 					.setDescription('Amari flagged a member! Please respond to this ASAP to maintain good relations with said member!')
 					.addFields({ name: 'Flagged Member', value: `${member}` });
 
-				const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-					new ButtonBuilder()
-						.setCustomId(`screening-approve-${member.user.id}`)
-						.setLabel(`Approve ${member.displayName}`)
-						.setStyle(ButtonStyle.Success),
-					new ButtonBuilder()
-						.setCustomId(`screening-reject-${member.user.id}`)
-						.setLabel(`Reject ${member.displayName}`)
-						.setStyle(ButtonStyle.Danger)
-				);
-
 				await staffChannel.send({ embeds: [flaggedEmbed], components: [staffActionRow] });
 			} else {
 				const acceptedEmbed = new EmbedBuilder()
@@ -161,7 +161,7 @@ export class UserEvent extends Listener {
 				await member.send({ embeds: [acceptedEmbed] }).catch(() => null); // Ignore failure, welcome messages are often ignored anyways :c
 
 				acceptedEmbed.setDescription(`${member} has passed all automated checks and was allowed to enter the VTA!`);
-				await staffChannel.send({ embeds: [acceptedEmbed] });
+				await staffChannel.send({ embeds: [acceptedEmbed], components: [staffActionRow] });
 			}
 		} catch (error) {
 			this.container.logger.error(`[Sentry] failed to screen @${member.user.username}[${member.user.id}]`);

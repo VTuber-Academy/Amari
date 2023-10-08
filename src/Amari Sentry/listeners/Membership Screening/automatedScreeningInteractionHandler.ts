@@ -2,6 +2,9 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
 import { EmbedBuilder, Interaction } from 'discord.js';
 import config from '../../config.json';
+import { Duration } from '@sapphire/time-utilities';
+
+const newMemberMap = new Map<string, NodeJS.Timeout>();
 
 @ApplyOptions<Listener.Options>({
 	event: Events.InteractionCreate,
@@ -21,6 +24,18 @@ export class UserEvent extends Listener {
 			switch (args[1]) {
 				case 'approve':
 					if (!member) return interaction.reply({ content: 'Cannot find member in the server!', ephemeral: true });
+
+					const timeout = setTimeout(async () => {
+						const mem = await interaction.guild?.members.fetch(member.id).catch(() => undefined);
+						if (!mem) return;
+
+						await interaction.followUp({
+							content:
+								"It appears that this member hasn't interaction with the server in the last 24 hours... How bout we check them out?"
+						});
+					}, new Duration('1 day').offset);
+
+					newMemberMap.set(member.id, timeout);
 
 					resultsEmbed
 						.setColor('Green')
@@ -51,3 +66,5 @@ export class UserEvent extends Listener {
 		}
 	}
 }
+
+export default newMemberMap;
