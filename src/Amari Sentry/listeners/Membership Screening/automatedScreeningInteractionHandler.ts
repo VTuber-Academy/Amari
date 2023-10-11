@@ -16,7 +16,7 @@ export class UserEvent extends Listener {
 			const args = interaction.customId.split('-');
 
 			if (args[0] != 'screening') return;
-			const member = args[2] ? await interaction.guild?.members.fetch(args[2]) : undefined;
+			const member = args[2] ? await interaction.guild?.members.fetch(args[2]).catch(() => undefined) : undefined;
 
 			const resultsEmbed = new EmbedBuilder().setTimestamp();
 
