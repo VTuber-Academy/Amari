@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import { EmbedBuilder, Interaction } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, MessageActionRowComponentBuilder } from 'discord.js';
 import config from '../../config.json';
 import { Duration } from '@sapphire/time-utilities';
 
@@ -19,7 +19,9 @@ export class UserEvent extends Listener {
 			const member = args[2] ? await interaction.guild?.members.fetch(args[2]) : undefined;
 
 			const resultsEmbed = new EmbedBuilder().setTimestamp();
-			await interaction.update({ components: [] });
+
+			const decoratedButton = new ButtonBuilder().setCustomId('notlikethismatters').setDisabled(true);
+			const actionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
 			switch (args[1]) {
 				case 'approve':
@@ -29,11 +31,15 @@ export class UserEvent extends Listener {
 						const mem = await interaction.guild?.members.fetch(member.id).catch(() => undefined);
 						if (!mem) return;
 
-						await interaction.followUp({
+						await interaction.message.reply({
 							content:
 								"It appears that this member hasn't interaction with the server in the last 24 hours... How bout we check them out?"
 						});
 					}, new Duration('1 day').offset);
+
+					decoratedButton.setLabel(`Approved by @${interaction.user.username}`).setStyle(ButtonStyle.Success);
+					actionRow.addComponents(decoratedButton);
+					await interaction.update({ components: [actionRow] });
 
 					newMemberMap.set(member.id, timeout);
 
@@ -56,6 +62,10 @@ export class UserEvent extends Listener {
 						.setDescription(
 							'A staff has manually reviewed your profile and found your profile to be harmful towards the discord server. If you think this is a mistake, contact VTA through twitter! [@VTuberAcademy](https://x.com/vtuberacademy)'
 						);
+
+					decoratedButton.setLabel(`Rejected by @${interaction.user.username}`).setStyle(ButtonStyle.Danger);
+					actionRow.addComponents(decoratedButton);
+					await interaction.update({ components: [actionRow] });
 
 					return interaction.guild?.bans.create(args[2], {
 						reason: `Suspicious or Spam Account\nResponsible moderator: @${interaction.member?.user.username} (${interaction.user.id})`
