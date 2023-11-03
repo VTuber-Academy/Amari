@@ -1,9 +1,8 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
-import { AttachmentBuilder, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import levelManager from '../lib/levelManager';
-import { Rank } from 'canvacord';
 
 @ApplyOptions<Subcommand.Options>({
 	name: 'Levels',
@@ -161,27 +160,35 @@ export class UserCommand extends Subcommand {
 			return interaction.editReply(`${targetUser} has never meowed in the server before! (╯°□°)╯︵ ┻━┻`);
 		}
 
-		const card = new Rank()
-			.setAvatar(targetUser.displayAvatarURL())
-			.setCurrentXP(targetProfile.experience, '#FFFFFF')
-			.setLevel(targetProfile.level)
-			.setLevelColor('#FFFFFf')
-			.setRank(0, '', false)
-			.setProgressBar(['#D84549', '#F18B8F'], 'GRADIENT', true)
-			.setBackground('COLOR', '#383444')
-			.setRequiredXP(levelManager.calculateNextLevelXP(targetProfile.level), '#B53E40')
-			.setUsername(`@${targetUser.username}`);
+		const emojibar: string[] = [];
+		const percentageToLevelUp = targetProfile.experience / levelManager.calculateNextLevelXP(targetProfile.level);
 
-		return card.build().then(async (data) => {
-			const attachment = new AttachmentBuilder(data, {
-				name: `RC-${targetUser.username}-${Date.now()}.png`,
-				description: `${targetUser.username}'s Rank card generated on ${new Date()}`
-			});
+		const barLength = 10;
+		const filledCount = Math.floor(percentageToLevelUp * barLength);
 
-			return interaction.editReply({
-				files: [attachment]
-			});
-		});
+		for (let i = 0; i < barLength; i++) {
+			if (i === 0) {
+				emojibar.push(filledCount > 0 ? '<:barstartfill:1169144871530004480>' : '<:barstartempty:1169144868136828929>');
+			} else if (i === barLength - 1) {
+				emojibar.push(filledCount >= barLength ? '<:barendfill:1169144857814650962>' : '<:barendempty:1169144854362718278>');
+			} else if (i < filledCount) {
+				emojibar.push('<:barmiddlefill:1169144859882426510>');
+			} else {
+				emojibar.push('<:barmiddleempty:1169144863908970556>');
+			}
+		}
+
+		const card = new EmbedBuilder()
+			.setColor('Green')
+			.setTitle(
+				`✨   Level ${targetProfile.level}  «  [${targetProfile.experience} / ${levelManager.calculateNextLevelXP(targetProfile.level)}]   ⭐`
+			)
+			.setDescription(`### ${emojibar.join('')}`)
+			.setTimestamp()
+			.setThumbnail('https://cdn3.emoji.gg/emojis/1835-pixelpaws.png')
+			.setAuthor({ iconURL: targetUser.displayAvatarURL(), name: targetUser.username });
+
+		return interaction.editReply({ embeds: [card] });
 	}
 
 	public async leaderboardCommand(interaction: Subcommand.ChatInputCommandInteraction) {
