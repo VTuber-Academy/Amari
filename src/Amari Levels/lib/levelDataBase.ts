@@ -14,5 +14,7 @@ const levelSchema = new Schema<LevelsInterface>({
 	lastActivity: { type: Date, default: new Date() }
 });
 
+levelSchema.index({ level: 1, experience: -1 });
+
 const levelDatabase = model<LevelsInterface>('Amari Levels', levelSchema);
 export default levelDatabase;
