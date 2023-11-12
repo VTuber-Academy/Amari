@@ -1,10 +1,7 @@
-<div align="center">
+<div align=center>
+<img src="https://github.com/VTuber-Academy/Amari/assets/77004524/cc90bd0e-88b7-4b13-9c6b-e535f1fcf176" width=1100 />
 
-###### ✨ Empowering Communities, Inspiring Connections ✨
-
-# Amari
-
-[![VTuber Academy](https://dcbadge.vercel.app/api/server/vta)](https://discord.gg/vta)
+[![VTuber Academy](https://dcbadge.vercel.app/api/server/vta)](https://discord.gg/vta) ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m795150097-736df5d7df9d0b418c13515a?style=for-the-badge&label=VTA%20Bot%20Status) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=VTuber-Academy_Amari&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=VTuber-Academy_Amari)
 
 </div>
 
