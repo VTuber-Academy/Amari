@@ -88,25 +88,23 @@ export class UserCommand extends Subcommand {
 	public async roleCommand(interaction: Subcommand.ChatInputCommandInteraction) {
 		await interaction.deferReply({ ephemeral: true });
 
-		const hexColor: string = interaction.options.getString('hex-color', true);
-
-		// check if hexColor is colorresolvable
-		let color: ColorResolvable;
-
-		try {
-			color = hexColor as ColorResolvable;
-		} catch (err) {
-			return interaction.editReply({ content: 'Color not supported!' });
-		}
+		const hexColor: ColorResolvable = interaction.options.getString('hex-color', true) as ColorResolvable;
 
 		// validate if member has a rolereward role
-		config.roleRewards.forEach(async (role) => {
+		config.roleRewards.forEach(async (role, i) => {
+			if (i === 3) return;
 			const roleReward = await interaction.guild?.roles.fetch(role);
 			if (!roleReward) return;
 
 			if (roleReward.members.find((member) => member.id === interaction.user.id)) {
-				await roleReward.setColor(color);
-				return interaction.editReply({ content: 'Your role color has been updated!' });
+				return roleReward
+					.setColor(hexColor)
+					.catch(() => {
+						return interaction.editReply({ content: 'Color not supported!' });
+					})
+					.then(() => {
+						return interaction.editReply({ content: 'Your role color has been updated!' });
+					});
 			}
 
 			return interaction.editReply({ content: "You don't have a role reward role!" });
