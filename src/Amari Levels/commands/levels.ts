@@ -111,8 +111,6 @@ export class UserCommand extends Subcommand {
 
 			return interaction.editReply({ content: "You don't have a role reward role!" });
 		});
-
-		return;
 	}
 
 	public async finalizeCycle(interaction: Subcommand.ChatInputCommandInteraction) {
