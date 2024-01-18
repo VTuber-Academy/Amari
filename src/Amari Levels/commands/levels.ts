@@ -118,7 +118,7 @@ export class UserCommand extends Subcommand {
 
 		// Check for permissions
 		if (!interaction.memberPermissions?.has('Administrator'))
-			return interaction.reply({ content: "You don't have permissions to run this command >:C", ephemeral: true });
+			return interaction.editReply({ content: "You don't have permissions to run this command >:C" });
 
 		// All users ranked highest to lowest
 		const allUsers = await levelDatabase
