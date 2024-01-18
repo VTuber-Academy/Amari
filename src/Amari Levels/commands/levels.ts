@@ -128,6 +128,14 @@ export class UserCommand extends Subcommand {
 
 		const topThree = allUsers.slice(0, 3);
 
+		const activeRole = await interaction.guild?.roles.fetch(config.roleRewards[3]);
+		if (!activeRole) return interaction.channel?.send(`Can't find active role ${config.roleRewards[3]}`);
+
+		// Reset active role
+		activeRole.members.forEach(async (member) => {
+			await member.roles.remove(activeRole);
+		});
+
 		topThree.forEach(async (member, i) => {
 			// Fetch all required info from discord
 			const discordMember = await interaction.guild?.members.fetch(member.id);
@@ -149,7 +157,7 @@ export class UserCommand extends Subcommand {
 			);
 
 			// Add role
-			return discordMember.roles.add(rewardRole);
+			return discordMember.roles.add([rewardRole, activeRole], 'Level Cycle Finalized!');
 		});
 
 		// Clear the database
