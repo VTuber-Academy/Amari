@@ -1,4 +1,6 @@
 {
 	"messageCooldown": "10 seconds",
-	"IgnoreChannels": []
+	"IgnoreChannels": [],
+	"roleRewards": ["1197532662219411496", "1197532841081315400", "1197533269869219972"]
+
 }
