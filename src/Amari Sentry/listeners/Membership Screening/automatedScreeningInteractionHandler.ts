@@ -2,9 +2,6 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, MessageActionRowComponentBuilder } from 'discord.js';
 import config from '../../config.json';
-import { Duration } from '@sapphire/time-utilities';
-
-const newMemberMap = new Map<string, NodeJS.Timeout>();
 
 @ApplyOptions<Listener.Options>({
 	event: Events.InteractionCreate,
@@ -27,21 +24,9 @@ export class UserEvent extends Listener {
 				case 'approve':
 					if (!member) return interaction.reply({ content: 'Cannot find member in the server!', ephemeral: true });
 
-					const timeout = setTimeout(async () => {
-						const mem = await interaction.guild?.members.fetch(member.id).catch(() => undefined);
-						if (!mem) return;
-
-						await interaction.message.reply({
-							content:
-								"It appears that this member hasn't interaction with the server in the last 24 hours... How bout we check them out?"
-						});
-					}, new Duration('1 day').offset);
-
 					decoratedButton.setLabel(`Approved by @${interaction.user.username}`).setStyle(ButtonStyle.Success);
 					actionRow.addComponents(decoratedButton);
 					await interaction.update({ components: [actionRow] });
-
-					newMemberMap.set(member.id, timeout);
 
 					resultsEmbed
 						.setColor('Green')
@@ -76,5 +61,3 @@ export class UserEvent extends Listener {
 		}
 	}
 }
-
-export default newMemberMap;

@@ -1,8 +1,9 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
-import { EmbedBuilder } from 'discord.js';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 import levelManager from '../lib/levelManager';
+import config from '../config.json';
 
 @ApplyOptions<Subcommand.Options>({
 	name: 'Levels',
@@ -28,6 +29,14 @@ import levelManager from '../lib/levelManager';
 		{
 			name: 'clearempty',
 			chatInputRun: 'clearEmpty'
+		},
+		{
+			name: 'finalize',
+			chatInputRun: 'finalizeCycle'
+		},
+		{
+			name: 'role',
+			chatInputRun: 'roleCommand'
 		}
 	]
 })
@@ -64,7 +73,96 @@ export class UserCommand extends Subcommand {
 						.addUserOption((input) => input.setName('of').setDescription('The member to be audited'))
 				)
 				.addSubcommand((command) => command.setName('clearempty').setDescription('Clear members that are not in the server manually!'))
+				.addSubcommand((command) => command.setName('finalize').setDescription('Finalize the current level cycle period!'))
+				.addSubcommand((command) =>
+					command
+						.setName('role')
+						.setDescription('Customize the color of your name in the server!')
+						.addStringOption((option) =>
+							option.setName('hex-color').setDescription('The color you want your name to be! IN HEX!').setRequired(true)
+						)
+				)
 		);
+	}
+
+	public async roleCommand(interaction: Subcommand.ChatInputCommandInteraction) {
+		await interaction.deferReply({ ephemeral: true });
+
+		const hexColor: ColorResolvable = interaction.options.getString('hex-color', true) as ColorResolvable;
+
+		// validate if member has a rolereward role
+		config.roleRewards.forEach(async (role, i) => {
+			if (i === 3) return;
+			const roleReward = await interaction.guild?.roles.fetch(role);
+			if (!roleReward) return;
+
+			if (roleReward.members.find((member) => member.id === interaction.user.id)) {
+				return roleReward
+					.setColor(hexColor)
+					.catch(() => {
+						return interaction.editReply({ content: 'Color not supported!' });
+					})
+					.then(() => {
+						return interaction.editReply({ content: 'Your role color has been updated!' });
+					});
+			}
+
+			return interaction.editReply({ content: "You don't have a role reward role!" });
+		});
+	}
+
+	public async finalizeCycle(interaction: Subcommand.ChatInputCommandInteraction) {
+		await interaction.deferReply({ ephemeral: true });
+
+		// Check for permissions
+		if (!interaction.memberPermissions?.has('Administrator'))
+			return interaction.editReply({ content: "You don't have permissions to run this command >:C" });
+
+		// All users ranked highest to lowest
+		const allUsers = await levelDatabase
+			.find({})
+			.sort({ level: -1, experience: -1 })
+			.catch(() => []);
+
+		const topThree = allUsers.slice(0, 3);
+
+		const activeRole = await interaction.guild?.roles.fetch(config.roleRewards[3]);
+		if (!activeRole) return interaction.channel?.send(`Can't find active role ${config.roleRewards[3]}`);
+
+		// Reset active role
+		activeRole.members.forEach(async (member) => {
+			await member.roles.remove(activeRole);
+		});
+
+		topThree.forEach(async (member, i) => {
+			// Fetch all required info from discord
+			const discordMember = await interaction.guild?.members.fetch(member.id);
+			if (!discordMember) return interaction.channel?.send(`Can't find ${member.id} within the server`);
+
+			const rewardRole = await interaction.guild?.roles.fetch(config.roleRewards[i]);
+			if (!rewardRole) return interaction.channel?.send(`Can't find reward role ${config.roleRewards[i]}`);
+
+			// Reset role
+			rewardRole.members.forEach(async (member) => {
+				await member.roles.remove(rewardRole);
+			});
+			await rewardRole.setColor('Default');
+
+			await discordMember.send(
+				`Congratulations! In the last period, you ranked [#${
+					i + 1
+				}] within the VTA in terms of activity!\n\nYou now have access to /level role to customize your appearance within the server!`
+			);
+
+			// Add role
+			return discordMember.roles.add([rewardRole, activeRole], 'Level Cycle Finalized!');
+		});
+
+		// Clear the database
+		await levelDatabase.deleteMany({});
+
+		// Finalize the interaction
+		return interaction.editReply({ content: 'Finalized the level cycle!' });
 	}
 
 	public async addCommand(interaction: Subcommand.ChatInputCommandInteraction) {
