@@ -22,7 +22,7 @@ export class UserEvent extends Listener {
 		)
 			return;
 
-		const xp = Math.floor(Math.random() * (30 - 15 + 1)) + 15;
+		const xp = Math.floor(Math.random() * 16) + 15;
 		await levelManager.addXP(xp, message.author.id).then(async (levelled) => {
 			if (levelled) {
 				await message.react('⭐');
