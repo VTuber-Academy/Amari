@@ -34,12 +34,14 @@ export class UserEvent extends Listener {
 				const tracker = trackerMap.get(newState.member.id);
 				if (!tracker) return clearInterval(intervalId);
 
-				if (newState.member.voice.selfMute) {
-					tracker.activeMinutes += 0.5;
-				} else if (newState.member.voice.streaming) {
-					tracker.activeMinutes += 1.2;
-				} else {
-					tracker.activeMinutes += 1;
+				if (newState.channel?.members.size !== 1) {
+					if (newState.member.voice.selfMute) {
+						tracker.activeMinutes += 0.5;
+					} else if (newState.member.voice.streaming) {
+						tracker.activeMinutes += 1.2;
+					} else {
+						tracker.activeMinutes += 1;
+					}
 				}
 			}, 60000);
 
