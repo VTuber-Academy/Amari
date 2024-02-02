@@ -6,6 +6,7 @@
 	"license": "AGPL-3.0",
 	"type": "commonjs",
 	"dependencies": {
+		"@octokit/rest": "^20.0.2",
 		"@sapphire/decorators": "^6.0.1",
 		"@sapphire/discord-utilities": "^3.0.3",
 		"@sapphire/discord.js-utilities": "6.0.7",
@@ -16,7 +17,7 @@
 		"@sapphire/plugin-logger": "^3.0.3",
 		"@sapphire/plugin-subcommands": "^4.0.1",
 		"@sapphire/time-utilities": "^1.7.9",
-		"@sapphire/type": "^2.4.0",
+		"@sapphire/type": "^2.4.4",
 		"@sapphire/utilities": "^3.11.1",
 		"@skyra/env-utilities": "^1.2.0",
 		"@swc/cli": "^0.1.62",
