@@ -52,6 +52,7 @@ export class UserEvent extends Listener {
 
 			let xp = 0;
 
+     Amari-Levels-Preview
 			for (let minute = 0; minute < tracker.activeMinutes; minute++) {
 				xp += Math.floor(Math.random() * 8) * ((minute + 1) / (tracker.activeMinutes + 1));
 			}
