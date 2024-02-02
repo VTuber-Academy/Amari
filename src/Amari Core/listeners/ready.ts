@@ -34,11 +34,13 @@ export class UserEvent extends Listener {
 	}
 
 	private async fetchVersion() {
-		const octokit = new Octokit();
+		const octokit = new Octokit({
+			auth: process.env.GITHUB_TOKEN
+		});
 
 		const { data } = await octokit.rest.repos.listCommits({
-			owner: 'VTuber-Academy',
-			repo: 'Amari'
+			owner: process.env.GITHUB_ORG ?? '',
+			repo: process.env.GITHUB_REPO ?? ''
 		});
 
 		const latestCommitHash = data[0].sha.substring(0, 7);
