@@ -2,8 +2,10 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Listener, type Store } from '@sapphire/framework';
 import { blue, gray, green, magenta, magentaBright, white, yellow } from 'colorette';
 import mongoose from 'mongoose';
+import { Octokit } from '@octokit/rest';
 
 const dev = process.env.NODE_ENV !== 'production';
+let version = 'fetching...';
 
 @ApplyOptions<Listener.Options>({ once: true })
 export class UserEvent extends Listener {
@@ -14,6 +16,10 @@ export class UserEvent extends Listener {
 		this.printStoreDebugInformation();
 
 		await this.connectMongo();
+		await this.fetchVersion().then((v) => {
+			version = v;
+			this.container.logger.info(`Version retrieved! Amari is running on  #${version}`);
+		});
 	}
 
 	private async connectMongo() {
@@ -25,6 +31,18 @@ export class UserEvent extends Listener {
 			.connect(process.env.MongoDB_URL, { dbName: process.env.MongoDB_Name })
 			.catch((error) => new Error(error))
 			.then(() => this.container.logger.info(`Mongoose successfully connected!`));
+	}
+
+	private async fetchVersion() {
+		const octokit = new Octokit();
+
+		const { data } = await octokit.rest.repos.listCommits({
+			owner: 'VTuber-Academy',
+			repo: 'Amari'
+		});
+
+		const latestCommitHash = data[0].sha.substring(0, 7);
+		return latestCommitHash;
 	}
 
 	private printBanner() {
@@ -62,3 +80,5 @@ ${line03}${dev ? ` ${pad}${blc('<')}${llc('/')}${blc('>')} ${llc('DEVELOPMENT MO
 		return gray(`${last ? '└─' : '├─'} Loaded ${this.style(store.size.toString().padEnd(3, ' '))} ${store.name}.`);
 	}
 }
+
+export default version;
