@@ -32,3 +32,4 @@ src/.env
 
 # Blacklist commands and files meant for testing
 *.test.ts
+version.js
