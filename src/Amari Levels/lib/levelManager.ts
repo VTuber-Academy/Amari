@@ -32,12 +32,17 @@ class LevelManager extends EventEmitter {
 		const amount = Number(amountAsString);
 		userEntry.experience += amount;
 
-		const isLevelUp = this.levelUpCheck(userEntry.level, userEntry.experience);
-		if (isLevelUp) {
-			userEntry.level += 1;
-			userEntry.experience = 0;
+		let isLevelUp = this.levelUpCheck(userEntry.level, userEntry.experience);
 
+		if (isLevelUp) {
 			this.emit('levelledUp', userEntry);
+		}
+
+		while (isLevelUp) {
+			userEntry.experience -= this.calculateNextLevelXP(userEntry.level);
+			userEntry.level += 1;
+
+			isLevelUp = this.levelUpCheck(userEntry.level, userEntry.experience);
 		}
 
 		userEntry.lastActivity = new Date();
