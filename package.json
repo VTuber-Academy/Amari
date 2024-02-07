@@ -6,7 +6,6 @@
 	"license": "AGPL-3.0",
 	"type": "commonjs",
 	"dependencies": {
-		"@octokit/rest": "^20.0.2",
 		"@sapphire/decorators": "^6.0.1",
 		"@sapphire/discord-utilities": "^3.0.3",
 		"@sapphire/discord.js-utilities": "6.0.7",
