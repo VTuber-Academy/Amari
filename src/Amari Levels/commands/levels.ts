@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
-import { ColorResolvable, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction } from 'discord.js';
 import levelManager from '../lib/levelManager';
 import config from '../config.json';
 
@@ -19,12 +19,8 @@ import config from '../config.json';
 			chatInputRun: 'leaderboardCommand'
 		},
 		{
-			name: 'add',
-			chatInputRun: 'addCommand'
-		},
-		{
-			name: 'remove',
-			chatInputRun: 'removeCommand'
+			name: 'modify',
+			chatInputRun: 'modifyCommand'
 		},
 		{
 			name: 'clearempty',
@@ -49,21 +45,13 @@ export class UserCommand extends Subcommand {
 				.setDescription('All level related commands') // Needed even though base command isn't displayed to end user
 				.addSubcommand((command) =>
 					command
-						.setName('add')
-						.setDescription('Give members level and reset their XPs to 0')
+						.setName('modify')
+						.setDescription('Make changes to a member\'s level and experience')
+						.addUserOption((input) => input.setName('target').setDescription('The user that is going get the change').setRequired(true))
 						.addIntegerOption((input) =>
-							input.setName('levels').setDescription('Amount of levels to add').setMinValue(1).setRequired(true)
+							input.setName('level').setDescription('level to set on the member').setMinValue(0)
 						)
-						.addUserOption((input) => input.setName('to').setDescription('The user that is going to gain levels').setRequired(true))
-				)
-				.addSubcommand((command) =>
-					command
-						.setName('remove')
-						.setDescription('Remove members level and reset their XPs to 0')
-						.addIntegerOption((input) =>
-							input.setName('levels').setDescription('Amount of levels to remove').setMinValue(1).setRequired(true)
-						)
-						.addUserOption((input) => input.setName('from').setDescription('The user that is going to gain levels').setRequired(true))
+						.addIntegerOption((input) => input.setName('experience').setDescription('experience to set on the member').setMinValue(0))
 				)
 				.addSubcommand((command) => command.setName('leaderboard').setDescription("Ladders of every member's activity"))
 				.addSubcommand((command) =>
@@ -149,8 +137,7 @@ export class UserCommand extends Subcommand {
 			await rewardRole.setColor('Default');
 
 			await discordMember.send(
-				`Congratulations! In the last period, you ranked [#${
-					i + 1
+				`Congratulations! In the last period, you ranked [#${i + 1
 				}] within the VTA in terms of activity!\n\nYou now have access to /level role to customize your appearance within the server!`
 			);
 
@@ -165,87 +152,72 @@ export class UserCommand extends Subcommand {
 		return interaction.editReply({ content: 'Finalized the level cycle!' });
 	}
 
-	public async addCommand(interaction: Subcommand.ChatInputCommandInteraction) {
+	public async modifyCommand(interaction: Subcommand.ChatInputCommandInteraction) {
 		if (!interaction.memberPermissions?.has('ManageRoles'))
-			return interaction.reply({ content: 'Chu need teh manage roles purrmission (╯°□°)╯︵ ┻━┻' });
+			return interaction.reply({ content: 'You need to be able to `Manage Roles` in order to modify a member\'s levels!', ephemeral: true });
 
-		const rewarded = interaction.options.getUser('to', true);
-		let profile = await levelDatabase.findOne({ id: rewarded.id });
+		const target = interaction.options.getUser('target', true);
+		const level = interaction.options.getInteger('level', false);
+		const experience = interaction.options.getInteger('experience', false);
+
+		if (!level && !experience)
+			return interaction.reply({ content: 'You need to provide a level or experience to modify!', ephemeral: true });
+
+		let profile = await levelDatabase.findOne({ id: target.id });
 
 		if (!profile) {
 			profile = new levelDatabase({
-				id: rewarded.id,
+				id: target.id,
 				level: 0,
 				experience: 0
 			});
 		}
 
-		const levelsToAdd = interaction.options.getInteger('levels', true);
-		profile.level += levelsToAdd;
-		profile.experience = 0;
-		profile.lastActivity = new Date();
-
-		await profile.save();
-
-		const notifier = new EmbedBuilder()
-			.setColor('Green')
-			.setTitle(`${levelsToAdd} levels rewarded to ${rewarded.username}`)
-			.setDescription(`From: ${interaction.user.username}`)
-			.setFooter({ text: `You are now level ${profile.level}` })
+		const warningEmbed = new EmbedBuilder()
+			.setColor('Yellow')
+			.setTitle(`Warning! ⚠️`)
+			.setDescription(`${target.username} will be notified of the changes. Are you sure you want to proceed?\n\nCommand:\n Set-Level: ${level ?? profile.level}\nExperience: ${experience ?? profile.experience}`)
 			.setTimestamp();
 
-		await rewarded.send({
-			content: 'Buzz! New Notification!',
-			embeds: [notifier]
-		});
+		const warningRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(new ButtonBuilder().setCustomId('confirm-modify').setEmoji('✅').setLabel('Continue').setStyle(ButtonStyle.Danger));
 
-		return interaction.reply({
-			content: `${rewarded.username} has been notified!`,
-			embeds: [notifier],
-			ephemeral: true
-		});
-	}
+		const msg = await interaction.reply({ embeds: [warningEmbed], components: [warningRow] });
 
-	public async removeCommand(interaction: Subcommand.ChatInputCommandInteraction) {
-		if (!interaction.memberPermissions?.has('ManageRoles'))
-			return interaction.reply({ content: 'Chu need teh manage roles purrmission (╯°□°)╯︵ ┻━┻', ephemeral: true });
+		const filter = (i: MessageComponentInteraction) => i.customId === 'confirm-modify' && i.user.id === interaction.user.id;
 
-		const deducted = interaction.options.getUser('from', true);
-		let profile = await levelDatabase.findOne({ id: deducted.id });
+		const collector = interaction.channel?.createMessageComponentCollector({ filter, time: 30000 });
 
-		if (!profile) {
-			return interaction.reply({
-				content: `${deducted.username} has never meowed in the server before (╯°□°)╯︵ ┻━┻`,
-				ephemeral: true
+		collector?.on('collect', async () => {
+			if (!profile) return;
+
+			if (level) profile.level = level;
+			if (experience) profile.experience = experience;
+
+			profile.lastActivity = new Date();
+
+			await profile.save();
+
+			warningEmbed.setColor('Green').setTitle('Success! ✅').setDescription(`${target.username} has been modified!`);
+			await msg.edit({ embeds: [warningEmbed], components: [] });
+
+			const notifier = new EmbedBuilder()
+				.setColor('Green')
+				.setTitle(`Your Level has been modified!`)
+				.setDescription(`${interaction.user.username} has modified your level to: \n\`\`\`Level: ${profile.level}\nExperience: ${profile.experience}\`\`\``)
+				.setTimestamp();
+
+			await target.send({
+				embeds: [notifier]
 			});
-		}
-
-		const levelsToRemove = interaction.options.getInteger('levels', true);
-		profile.level -= levelsToRemove;
-		profile.experience = 0;
-		profile.lastActivity = new Date();
-
-		if (profile.level < 0) profile.level = 0;
-
-		await profile.save();
-
-		const notifier = new EmbedBuilder()
-			.setColor('Orange')
-			.setTitle(`${levelsToRemove} levels deducted from ${deducted.username}`)
-			.setDescription(`By: ${interaction.user.username}`)
-			.setFooter({ text: `You are now level ${profile.level}` })
-			.setTimestamp();
-
-		await deducted.send({
-			content: 'Buzz! New Notification!',
-			embeds: [notifier]
 		});
 
-		return interaction.reply({
-			content: `${deducted.username} has been notified!`,
-			embeds: [notifier],
-			ephemeral: true
+		collector?.on('end', async (_collected, reason) => {
+			if (reason === 'time') {
+				await msg.edit({ content: 'Offer Expired', components: [] });
+			}
 		});
+
+		return;
 	}
 
 	public async rankCommand(interaction: Subcommand.ChatInputCommandInteraction) {
