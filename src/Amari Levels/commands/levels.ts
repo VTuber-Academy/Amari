@@ -23,10 +23,6 @@ import config from '../config.json';
 			chatInputRun: 'modifyCommand'
 		},
 		{
-			name: 'clearempty',
-			chatInputRun: 'clearEmpty'
-		},
-		{
 			name: 'finalize',
 			chatInputRun: 'finalizeCycle'
 		},
@@ -233,7 +229,7 @@ export class UserCommand extends Subcommand {
 		const emojibar: string[] = [];
 		const percentageToLevelUp = targetProfile.experience / levelManager.calculateNextLevelXP(targetProfile.level);
 
-		const barLength = 10;
+		const barLength = 8;
 		const filledCount = Math.floor(percentageToLevelUp * barLength);
 
 		for (let i = 0; i < barLength; i++) {
@@ -288,22 +284,5 @@ export class UserCommand extends Subcommand {
 		return interaction.editReply({
 			embeds: [leaderboardEmbed]
 		});
-	}
-
-	public async clearEmpty(interaction: Subcommand.ChatInputCommandInteraction) {
-		if (!interaction.memberPermissions?.has('Administrator'))
-			return interaction.reply({ content: 'you must be admin to use this cmd!', ephemeral: true });
-		await interaction.deferReply();
-
-		let deleted = 0;
-
-		(await levelDatabase.find({})).forEach(async (levelDb) => {
-			await interaction.guild?.members.fetch(levelDb.id).catch(() => {
-				levelDb.deleteOne();
-				deleted += 1;
-			});
-		});
-
-		return interaction.reply({ content: `Cleared ${deleted} database members!` });
 	}
 }
