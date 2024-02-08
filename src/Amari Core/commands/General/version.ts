@@ -1,7 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
-import version from '../../listeners/ready';
 
 @ApplyOptions<Command.Options>({
 	description: 'Current Amari Version'
@@ -21,7 +20,7 @@ export class UserCommand extends Command {
 		const embed = new EmbedBuilder()
 			.setAuthor({ name: '/version', iconURL: interaction.client.user.displayAvatarURL() })
 			.setColor('Blurple')
-			.setTitle(`Amari running on ${version}`)
+			.setTitle(`Amari running on 1.1 # Amethyst`)
 			.setDescription('Tracked from https://github.com/VTuber-Academy/Amari')
 			.setThumbnail('https://cdn3.emoji.gg/emojis/2800-kannaupvote.png')
 			.setTimestamp();
