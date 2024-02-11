@@ -1,23 +1,23 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
-import watchlistDatabase from 'Amari Sentry/lib/sentryWatchlist';
+import watchlistDatabase from '../lib/sentryWatchlist';
 
 @ApplyOptions<Subcommand.Options>({
-	description: 'Watchlist commands',
+	description: 'watchlist commands',
 	requiredUserPermissions: ['ModerateMembers'],
 	subcommands: [
 		{
 			name: 'add',
-			chatInputRun: 'add',
+			chatInputRun: 'add'
 		},
 		{
 			name: 'remove',
-			chatInputRun: 'remove',
+			chatInputRun: 'remove'
 		},
 		{
 			name: 'list',
-			chatInputRun: 'list',
-		},
+			chatInputRun: 'list'
+		}
 	]
 })
 export class UserCommand extends Subcommand {
@@ -26,14 +26,29 @@ export class UserCommand extends Subcommand {
 			builder //
 				.setName(this.name)
 				.setDescription(this.description)
-				.addSubcommand((subcommand) => subcommand.setName('add').setDescription('Add a user to the watchlist').addStringOption((option) => option.setName('userID').setDescription('The user to add to the watchlist').setRequired(true)).addStringOption((option) => option.setName('reason').setDescription('The reason for adding the user to the watchlist').setRequired(true)))
-				.addSubcommand((subcommand) => subcommand.setName('remove').setDescription('Remove a user from the watchlist').addStringOption((option) => option.setName('userID').setDescription('The user to remove from the watchlist').setRequired(true)))
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setName('add')
+						.setDescription('Add a user to the watchlist')
+						.addStringOption((option) => option.setName('userid').setDescription('The user to add to the watchlist').setRequired(true))
+						.addStringOption((option) =>
+							option.setName('reason').setDescription('The reason for adding the user to the watchlist').setRequired(true)
+						)
+				)
+				.addSubcommand((subcommand) =>
+					subcommand
+						.setName('remove')
+						.setDescription('Remove a user from the watchlist')
+						.addStringOption((option) =>
+							option.setName('userid').setDescription('The user to remove from the watchlist').setRequired(true)
+						)
+				)
 				.addSubcommand((subcommand) => subcommand.setName('list').setDescription('All users in the watchlist'))
-		)
+		);
 	}
 
 	public async add(interaction: Subcommand.ChatInputCommandInteraction) {
-		const userID = interaction.options.getString('userID', true);
+		const userID = interaction.options.getString('userid', true);
 		const reason = interaction.options.getString('reason', true);
 
 		let dbUser = await watchlistDatabase.findOne({ discordId: userID });
@@ -45,13 +60,13 @@ export class UserCommand extends Subcommand {
 			dbUser = new watchlistDatabase({ discordId: userID, reason: reason });
 			dbUser.save();
 
-			interaction.reply({ content: 'User added to the watchlist!', ephemeral: true })
+			interaction.reply({ content: 'User added to the watchlist!', ephemeral: true });
 			return;
 		}
 	}
 
 	public async remove(interaction: Subcommand.ChatInputCommandInteraction) {
-		const userID = interaction.options.getString('userID', true);
+		const userID = interaction.options.getString('userid', true);
 
 		const dbUser = await watchlistDatabase.findOne({ discordId: userID });
 
