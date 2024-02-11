@@ -30,10 +30,9 @@ class animeNewsNetworkFeed extends EventEmitter {
 
 		await Promise.all(
 			feed.items.map(async (currentItem) => {
-				if (items.filter((item) => item.guid === currentItem.guid).length <= 1) {
+				if (items.filter((item) => item.guid === currentItem.guid).length < 1) {
 					await annDb.create(currentItem);
 
-					console.log(`Posted: ${currentItem.title}`);
 					this.emit('new-item', currentItem);
 				}
 			})
