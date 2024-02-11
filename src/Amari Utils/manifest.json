@@ -1,9 +1,12 @@
 {
-    "Name": "Utilities",
-    "Description": "Helpful Commands for everyday use",
-    "Version": 1.0,
-    "configurationProfiles": {
-        "production": {},
-        "development": {}
-    }
+	"Name": "Utilities",
+	"Description": "Helpful Commands for everyday use",
+	"Version": 1.0,
+	"configurationProfiles": {
+		"production": {},
+		"development": {
+			"vtuberNewsServer": "1169144808103755788",
+			"vtuberNewsChannel": "1206175592861405224"
+		}
+	}
 }
