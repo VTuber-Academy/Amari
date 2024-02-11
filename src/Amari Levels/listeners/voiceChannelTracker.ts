@@ -64,7 +64,7 @@ export class UserEvent extends Listener {
 			let xp = 0;
 
 			for (let minute = 0; minute < tracker.activeMinutes; minute++) {
-				xp += Math.floor(Math.random() * 8) * ((minute + 1) / (tracker.activeMinutes + 1));
+				xp += Math.floor(Math.floor(Math.random() * 8) * ((minute + 1) / (tracker.activeMinutes + 1)));
 			}
 
 			const msg = await oldState.channel?.send(
