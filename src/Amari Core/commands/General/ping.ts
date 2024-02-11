@@ -17,13 +17,13 @@ export class UserCommand extends Command {
 
 	// slash command
 	public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-		const msg = await interaction.reply({ content: 'Ping?', fetchReply: true, ephemeral: true });
+		const msg = await interaction.reply({ content: 'Bringing over the tea set...', fetchReply: true, ephemeral: true });
 
 		const embed = new EmbedBuilder()
 			.setAuthor({ name: '/ping', iconURL: interaction.client.user.displayAvatarURL() })
-			.setColor('Blurple')
-			.setTitle('OH YEAH I\'VE BEEN PINGED')
-			.setDescription('Hey there! This is how long it took me to realize you pinged me 😅')
+			.setColor('Purple')
+			.setTitle('Command Received!')
+			.setDescription('I hope I wasn\'t too slow... 🫖')
 			.setFields(
 				{ name: 'Bot Latency:', value: `${this.container.client.ws.ping}ms`, inline: true },
 				{ name: 'API Latency:', value: `${msg.createdTimestamp - interaction.createdTimestamp}ms`, inline: true }

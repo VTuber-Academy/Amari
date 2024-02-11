@@ -4,7 +4,7 @@ import { EmbedBuilder, type VoiceState } from 'discord.js';
 import levelManager from '../lib/levelManager';
 import config from '../config.json';
 
-const trackerMap = new Map<string, { activeMinutes: number; intervalId: NodeJS.Timer }>();
+const trackerMap = new Map<string, { realMinutes: number; activeMinutes: number; intervalId: NodeJS.Timeout }>();
 
 @ApplyOptions<Listener.Options>({
 	event: Events.VoiceStateUpdate,
@@ -28,24 +28,33 @@ export class UserEvent extends Listener {
 		if (!oldState.channelId && newState.channelId) {
 			if (!newState.member) return;
 
-			const intervalId: NodeJS.Timer = setInterval(() => {
+			const intervalId: NodeJS.Timeout = setInterval(() => {
 				if (!newState.member) return clearInterval(intervalId);
 
 				const tracker = trackerMap.get(newState.member.id);
 				if (!tracker) return clearInterval(intervalId);
 
+				let gains = 0;
+
 				if (newState.channel?.members.size !== 1) {
-					if (newState.member.voice.selfMute) {
-						tracker.activeMinutes += 0.5;
-					} else if (newState.member.voice.streaming) {
-						tracker.activeMinutes += 1.2;
+					if (newState.member.voice.selfDeaf) {
+						gains += 0;
+					} else if (newState.member.voice.selfMute) {
+						gains += 0.5;
 					} else {
-						tracker.activeMinutes += 1;
+						gains += 1;
+					}
+
+					if (newState.member.voice.streaming) {
+						gains += 0.2;
 					}
 				}
+
+				tracker.activeMinutes += gains;
+				tracker.realMinutes += 1;
 			}, 60000);
 
-			trackerMap.set(newState.member.id, { activeMinutes: 0, intervalId });
+			trackerMap.set(newState.member.id, { activeMinutes: 0, intervalId, realMinutes: 0 });
 		} else if (oldState.channelId && !newState.channelId) {
 			if (!oldState.member) return;
 
@@ -59,7 +68,7 @@ export class UserEvent extends Listener {
 			}
 
 			const msg = await oldState.channel?.send(
-				`**${oldState.member.displayName}** has gained **${xp}** XP for being in the voice channel for **${tracker.activeMinutes}** minutes!`
+				`**${oldState.member.displayName}** has gained **${xp}** XP for being in the voice channel for **${tracker.realMinutes}** minutes! (Bonus: ${tracker.activeMinutes - tracker.realMinutes})`
 			);
 
 			levelManager.addXP(xp, oldState.member.id).then(async (levelled) => {
