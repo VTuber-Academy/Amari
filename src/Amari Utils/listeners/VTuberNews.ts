@@ -21,6 +21,16 @@ export class UserEvent extends Listener {
 				content: `# ${item.title}\n${item.content}...\n\nRead more here! ${item.link}\n\`\`\`${item.pubDate}\`\`\``
 			});
 
+			if (config.vtuberNewsPingRole) {
+				const msg = await channel.send(`<@&${config.vtuberNewsPingRole}>`);
+
+				setTimeout(() => {
+					if (msg.deletable) {
+						msg.delete();
+					}
+				}, 3000);
+			}
+
 			if (message.crosspostable) {
 				await message.crosspost();
 			}

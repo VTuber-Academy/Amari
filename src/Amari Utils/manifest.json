@@ -4,6 +4,7 @@
 	"Version": 1.0,
 	"configurationProfiles": {
 		"production": {
+			"vtuberNewsPingRole": "1206125132364521492",
 			"vtuberNewsServer": "747485611409145889",
 			"vtuberNewsChannel": "1206124669669998644"
 		},
