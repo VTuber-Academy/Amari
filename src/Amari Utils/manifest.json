@@ -3,7 +3,10 @@
 	"Description": "Helpful Commands for everyday use",
 	"Version": 1.0,
 	"configurationProfiles": {
-		"production": {},
+		"production": {
+			"vtuberNewsServer": "747485611409145889",
+			"vtuberNewsChannel": "1206124669669998644"
+		},
 		"development": {
 			"vtuberNewsServer": "1169144808103755788",
 			"vtuberNewsChannel": "1206175592861405224"
