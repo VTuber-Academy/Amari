@@ -33,6 +33,7 @@ class LevelManager extends EventEmitter {
 		userEntry.experience += amount;
 
 		let isLevelUp = this.levelUpCheck(userEntry.level, userEntry.experience);
+		const cacheLevelUp = isLevelUp;
 
 		if (isLevelUp) {
 			this.emit('levelledUp', userEntry);
@@ -48,7 +49,7 @@ class LevelManager extends EventEmitter {
 		userEntry.lastActivity = new Date();
 
 		await userEntry.save();
-		return isLevelUp;
+		return cacheLevelUp;
 	}
 
 	private levelUpCheck(currentLevel: number, currentXP: number) {
