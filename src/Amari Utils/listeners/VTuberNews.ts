@@ -13,7 +13,7 @@ export class UserEvent extends Listener {
 		const channel = await server.channels.fetch(config.vtuberNewsChannel);
 
 		if (!item.categories) return;
-		if (item.categories.length != 0 && item.categories.includes('VTubers')) {
+		if (item.categories.includes('VTubers')) {
 			if (!channel) return this.container.logger.error('Channel not found');
 			if (!channel.isTextBased()) return this.container.logger.error('Channel is not text based');
 
