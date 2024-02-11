@@ -1,7 +1,15 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ColorResolvable, EmbedBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ButtonStyle,
+	ColorResolvable,
+	EmbedBuilder,
+	MessageActionRowComponentBuilder,
+	MessageComponentInteraction
+} from 'discord.js';
 import levelManager from '../lib/levelManager';
 import config from '../config.json';
 
@@ -42,11 +50,9 @@ export class UserCommand extends Subcommand {
 				.addSubcommand((command) =>
 					command
 						.setName('modify')
-						.setDescription('Make changes to a member\'s level and experience')
+						.setDescription("Make changes to a member's level and experience")
 						.addUserOption((input) => input.setName('target').setDescription('The user that is going get the change').setRequired(true))
-						.addIntegerOption((input) =>
-							input.setName('level').setDescription('level to set on the member').setMinValue(0)
-						)
+						.addIntegerOption((input) => input.setName('level').setDescription('level to set on the member').setMinValue(0))
 						.addIntegerOption((input) => input.setName('experience').setDescription('experience to set on the member').setMinValue(0))
 				)
 				.addSubcommand((command) => command.setName('leaderboard').setDescription("Ladders of every member's activity"))
@@ -133,7 +139,8 @@ export class UserCommand extends Subcommand {
 			await rewardRole.setColor('Default');
 
 			await discordMember.send(
-				`Congratulations! In the last period, you ranked [#${i + 1
+				`Congratulations! In the last period, you ranked [#${
+					i + 1
 				}] within the VTA in terms of activity!\n\nYou now have access to /level role to customize your appearance within the server!`
 			);
 
@@ -150,14 +157,13 @@ export class UserCommand extends Subcommand {
 
 	public async modifyCommand(interaction: Subcommand.ChatInputCommandInteraction) {
 		if (!interaction.memberPermissions?.has('ManageRoles'))
-			return interaction.reply({ content: 'You need to be able to `Manage Roles` in order to modify a member\'s levels!', ephemeral: true });
+			return interaction.reply({ content: "You need to be able to `Manage Roles` in order to modify a member's levels!", ephemeral: true });
 
 		const target = interaction.options.getUser('target', true);
 		const level = interaction.options.getInteger('level', false);
 		const experience = interaction.options.getInteger('experience', false);
 
-		if (!level && !experience)
-			return interaction.reply({ content: 'You need to provide a level or experience to modify!', ephemeral: true });
+		if (!level && !experience) return interaction.reply({ content: 'You need to provide a level or experience to modify!', ephemeral: true });
 
 		let profile = await levelDatabase.findOne({ id: target.id });
 
@@ -172,10 +178,16 @@ export class UserCommand extends Subcommand {
 		const warningEmbed = new EmbedBuilder()
 			.setColor('Yellow')
 			.setTitle(`Warning! ⚠️`)
-			.setDescription(`${target.username} will be notified of the changes. Are you sure you want to proceed?\n\nCommand:\n Set-Level: ${level ?? profile.level}\nExperience: ${experience ?? profile.experience}`)
+			.setDescription(
+				`${target.username} will be notified of the changes. Are you sure you want to proceed?\n\nCommand:\n Set-Level: ${
+					level ?? profile.level
+				}\nExperience: ${experience ?? profile.experience}`
+			)
 			.setTimestamp();
 
-		const warningRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(new ButtonBuilder().setCustomId('confirm-modify').setEmoji('✅').setLabel('Continue').setStyle(ButtonStyle.Danger));
+		const warningRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+			new ButtonBuilder().setCustomId('confirm-modify').setEmoji('✅').setLabel('Continue').setStyle(ButtonStyle.Danger)
+		);
 
 		const msg = await interaction.reply({ embeds: [warningEmbed], components: [warningRow] });
 
@@ -199,7 +211,9 @@ export class UserCommand extends Subcommand {
 			const notifier = new EmbedBuilder()
 				.setColor('Green')
 				.setTitle(`Your Level has been modified!`)
-				.setDescription(`${interaction.user.username} has modified your level to: \n\`\`\`Level: ${profile.level}\nExperience: ${profile.experience}\`\`\``)
+				.setDescription(
+					`${interaction.user.username} has modified your level to: \n\`\`\`Level: ${profile.level}\nExperience: ${profile.experience}\`\`\``
+				)
 				.setTimestamp();
 
 			await target.send({
@@ -270,15 +284,14 @@ export class UserCommand extends Subcommand {
 			.sort({ level: -1, experience: -1 })
 			.catch(() => []);
 
-		if (allUsers.length === 0)
-			leaderboardEmbed.setDescription('No Data Available! This usually happens when the code errored out or no one has talked in the server!');
-
 		const memberRanking = allUsers.findIndex((member) => member.id === interaction.user.id) + 1;
 		if (memberRanking !== 0) leaderboardEmbed.setFooter({ text: `You rank #${memberRanking}!` });
 
 		const topTen = allUsers.slice(0, 10);
 		leaderboardEmbed.setDescription(
-			topTen.map((member, index) => `#${index + 1} - <@${member.id}> - Level: ${member.level} Exp: ${member.experience}`).join('\n')
+			allUsers.length === 0
+				? 'No Data Available!'
+				: topTen.map((member, index) => `#${index + 1} - <@${member.id}> - Level: ${member.level} Exp: ${member.experience}`).join('\n')
 		);
 
 		return interaction.editReply({
