@@ -8,6 +8,8 @@ import { annFeeder } from '../lib/animeNewsNetworkFeed';
 })
 export class UserEvent extends Listener {
 	public override async run() {
-		await annFeeder.fetch();
+		setInterval(async () => {
+			await annFeeder.fetch();
+		}, 60000);
 	}
 }
