@@ -1,16 +1,12 @@
 import './Amari Core/lib/setup';
 
 import { LogLevel, SapphireClient } from '@sapphire/framework';
-import { GatewayIntentBits, Partials } from 'discord.js';
+import { ActivityType, GatewayIntentBits, Partials } from 'discord.js';
 
 import { getRootData } from '@sapphire/pieces';
 import modules from './moduleRegistry.json';
 import { join } from 'node:path';
 import fs from 'fs';
-
-import express from 'express';
-const app = express();
-const port = 10000;
 
 interface PluginManifest {
 	Name: string;
@@ -21,15 +17,6 @@ interface PluginManifest {
 		test: Record<any, any>;
 	};
 }
-
-app.get('/', (_req, res) => {
-	// 200 status code means OK
-	res.status(200).send('Amari Network is Running!');
-});
-
-app.listen(port, () => {
-	console.log(`Amari Network listening to port ${port}`);
-});
 
 const client = new SapphireClient({
 	logger: {
@@ -47,7 +34,18 @@ const client = new SapphireClient({
 		GatewayIntentBits.GuildVoiceStates,
 		GatewayIntentBits.MessageContent
 	],
-	partials: [Partials.Channel, Partials.GuildMember]
+	partials: [Partials.Channel, Partials.GuildMember],
+	presence: {
+		status: 'online',
+		activities: [{ name: 'against Aquinn 💓', type: ActivityType.Playing }]
+	},
+	api: {
+		origin: '*',
+		prefix: 'api/',
+		listenOptions: {
+			port: 3000
+		}
+	}
 });
 
 const main = async () => {
