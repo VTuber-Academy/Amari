@@ -14,6 +14,7 @@ export class UserEvent extends Listener {
 		this.printStoreDebugInformation();
 
 		await this.connectMongo();
+		console.log(mongoose.connection.readyState === 1 ? 'Connected to MongoDB' : 'Failed to connect to MongoDB');
 	}
 
 	private async connectMongo() {
@@ -21,10 +22,7 @@ export class UserEvent extends Listener {
 			return new Error('Mongo Database URL not provided in .env');
 		}
 
-		return mongoose
-			.connect(process.env.MongoDB_URL, { dbName: process.env.MongoDB_Name })
-			.catch((error) => new Error(error))
-			.then(() => this.container.logger.info(`Mongoose successfully connected!`));
+		return mongoose.connect(process.env.MongoDB_URL, { dbName: process.env.MongoDB_Name }).catch((error) => new Error(error));
 	}
 
 	private printBanner() {
