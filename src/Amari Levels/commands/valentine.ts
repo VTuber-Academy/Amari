@@ -63,6 +63,7 @@ export class UserCommand extends Command {
 					.setTimestamp();
 
 				await msg.edit({ embeds: [notifier], components: [] });
+				await profile.save();
 			});
 
 			collector?.on('end', async (_collected, reason) => {
