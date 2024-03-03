@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import VTuberManager from 'VTuber Manager/lib/VTuberManager';
+import VTuberManager from '../lib/VTuberManager';
 import { Interaction } from 'discord.js';
 
 @ApplyOptions<Listener.Options>({
