@@ -122,8 +122,8 @@ class manageVTubers extends EventEmitter {
 
 		const moderatorActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 		moderatorActionRow.addComponents(
-			new ButtonBuilder().setCustomId(`vtuber:accept:${database._id}`).setLabel('Approve').setStyle(ButtonStyle.Success),
-			new ButtonBuilder().setCustomId(`vtuber:reject:${database._id}`).setLabel('Deny').setStyle(ButtonStyle.Danger)
+			new ButtonBuilder().setCustomId(`vtuber:accept:${discordId}`).setLabel('Approve').setStyle(ButtonStyle.Success),
+			new ButtonBuilder().setCustomId(`vtuber:reject:${discordId}`).setLabel('Deny').setStyle(ButtonStyle.Danger)
 		);
 
 		const message = await channel.send({
