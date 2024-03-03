@@ -37,7 +37,7 @@ const client = new SapphireClient({
 	partials: [Partials.Channel, Partials.GuildMember],
 	presence: {
 		status: 'online',
-		activities: [{ name: 'against Aquinn 💓', type: ActivityType.Playing }]
+		activities: [{ name: 'in the library 📚', type: ActivityType.Playing }]
 	},
 	api: {
 		origin: '*',

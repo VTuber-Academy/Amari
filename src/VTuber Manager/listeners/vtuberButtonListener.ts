@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Events, Listener } from '@sapphire/framework';
-import VTuberManager from 'VTuber Manager/lib/VTuberManager';
-import VTuberFormResponseModel from 'VTuber Manager/lib/VTubers';
+import VTuberManager from '../lib/VTuberManager';
+import VTuberFormResponseModel from '../lib/VTubers';
 import { ActionRowBuilder, Interaction, ModalActionRowComponentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } from 'discord.js';
 
 @ApplyOptions<Listener.Options>({
