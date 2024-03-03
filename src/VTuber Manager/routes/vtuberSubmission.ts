@@ -21,7 +21,7 @@ export class VTuberFormTemplate {
 	'Discord ID': string;
 
 	@IsString()
-	@IsIn(['Yes'])
+	@IsIn(['Yes', 'No'])
 	'Do you want to delete your application?': string;
 
 	@IsObject()
@@ -91,7 +91,7 @@ export class UserRoute extends Route {
 		const validationErrors = await validate(rawData);
 
 		if (validationErrors.length !== 0) {
-			return response.badRequest({ errors: validationErrors });
+			return response.badRequest(validationErrors);
 		}
 
 		let existingData = await VTuberFormResponseModel.findOne({ 'Discord ID': rawData['Discord ID'] });
