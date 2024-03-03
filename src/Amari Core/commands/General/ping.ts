@@ -23,7 +23,7 @@ export class UserCommand extends Command {
 			.setAuthor({ name: '/ping', iconURL: interaction.client.user.displayAvatarURL() })
 			.setColor('Purple')
 			.setTitle('Command Received!')
-			.setDescription('I hope I wasn\'t too slow... 🫖')
+			.setDescription("I hope I wasn't too slow... 🫖")
 			.setFields(
 				{ name: 'Bot Latency:', value: `${this.container.client.ws.ping}ms`, inline: true },
 				{ name: 'API Latency:', value: `${msg.createdTimestamp - interaction.createdTimestamp}ms`, inline: true }
@@ -32,7 +32,7 @@ export class UserCommand extends Command {
 
 		return await interaction.editReply({
 			content: '',
-			embeds: [embed],
+			embeds: [embed]
 		});
 	}
 }

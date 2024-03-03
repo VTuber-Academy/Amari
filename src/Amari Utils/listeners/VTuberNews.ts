@@ -13,13 +13,23 @@ export class UserEvent extends Listener {
 		const channel = await server.channels.fetch(config.vtuberNewsChannel);
 
 		if (!item.categories) return;
-		if (item.categories.length != 0 && item.categories.includes('VTubers')) {
+		if (item.categories.includes('VTubers')) {
 			if (!channel) return this.container.logger.error('Channel not found');
 			if (!channel.isTextBased()) return this.container.logger.error('Channel is not text based');
 
 			const message = await channel.send({
 				content: `# ${item.title}\n${item.content}...\n\nRead more here! ${item.link}\n\`\`\`${item.pubDate}\`\`\``
 			});
+
+			if (config.vtuberNewsPingRole) {
+				const msg = await channel.send(`<@&${config.vtuberNewsPingRole}>`);
+
+				setTimeout(() => {
+					if (msg.deletable) {
+						msg.delete();
+					}
+				}, 3000);
+			}
 
 			if (message.crosspostable) {
 				await message.crosspost();

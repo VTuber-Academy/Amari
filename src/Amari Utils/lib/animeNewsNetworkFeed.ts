@@ -1,6 +1,7 @@
 import Parser from 'rss-parser';
 import annDb from './animeNewsNetworkCache';
 import { EventEmitter } from 'events';
+import mongoose from 'mongoose';
 
 interface feedChannel {
 	title: string;
@@ -24,6 +25,7 @@ const parser: Parser<feedChannel, annFeedItem> = new Parser({});
 
 class animeNewsNetworkFeed extends EventEmitter {
 	async fetch() {
+		if (mongoose.connection.readyState !== 1) return;
 		const feed = await parser.parseURL('https://www.animenewsnetwork.com/interest/rss.xml?ann-edition=us');
 
 		const items = await annDb.find({});

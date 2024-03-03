@@ -64,11 +64,11 @@ export class UserEvent extends Listener {
 			let xp = 0;
 
 			for (let minute = 0; minute < tracker.activeMinutes; minute++) {
-				xp += Math.floor(Math.random() * 8) * ((minute + 1) / (tracker.activeMinutes + 1));
+				xp += Math.floor(Math.floor(Math.random() * 8) * ((minute + 1) / (tracker.activeMinutes + 1)));
 			}
 
 			const msg = await oldState.channel?.send(
-				`**${oldState.member.displayName}** has gained **${xp}** XP for being in the voice channel for **${tracker.realMinutes}** minutes! (Bonus: ${tracker.activeMinutes - tracker.realMinutes})`
+				`**${oldState.member.displayName}** has gained **${xp}** XP for being in the voice channel for **${tracker.realMinutes}** minutes! (${tracker.activeMinutes} minutes rewarded)`
 			);
 
 			levelManager.addXP(xp, oldState.member.id).then(async (levelled) => {
