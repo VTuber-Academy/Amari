@@ -193,7 +193,7 @@ export class UserCommand extends Subcommand {
 
 		const filter = (i: MessageComponentInteraction) => i.customId === 'confirm-modify' && i.user.id === interaction.user.id;
 
-		const collector = interaction.channel?.createMessageComponentCollector({ filter, time: 30000 });
+		const collector = interaction.channel?.createMessageComponentCollector({ filter, time: 30000, max: 1 });
 
 		collector?.on('collect', async () => {
 			if (!profile) return;
