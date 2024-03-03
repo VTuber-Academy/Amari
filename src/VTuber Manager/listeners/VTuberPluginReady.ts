@@ -3,7 +3,6 @@ import { Events, Listener } from '@sapphire/framework';
 import VTuberManager from '../lib/VTuberManager';
 import { Client } from 'discord.js';
 import config from '../config.json';
-import VTuberFormResponseModel from 'VTuber Manager/lib/VTubers';
 
 @ApplyOptions<Listener.Options>({
 	event: Events.ClientReady,
