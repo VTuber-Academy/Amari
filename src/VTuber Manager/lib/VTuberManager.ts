@@ -234,7 +234,7 @@ class manageVTubers extends EventEmitter {
 		const embed = new EmbedBuilder()
 			.setColor('#e94e4e')
 			.setTitle(`${formResponse['VTuber Name'] ?? 'Profile scheduled deletation'}`)
-			.setDescription(`${formResponse['Description (3rd person perspective recommended)' ?? 'Profile scheduled deletation']}`)
+			.setDescription(`${formResponse['Description (3rd person perspective recommended)'] ?? 'Profile scheduled deletation'}`)
 			.setTimestamp();
 
 		const files: AttachmentBuilder[] = [];
