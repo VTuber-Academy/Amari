@@ -46,7 +46,7 @@ const VTuberFormResponseSchema: Schema = new Schema({
 	'YouTube / TikTok URL': { type: String },
 	ResponseID: { type: String, required: true },
 	Status: {
-		code: { type: Number, enum: [0, 1, 2], default: 0 },
+		code: { type: String },
 		id: { type: String },
 		lastUpdated: { type: Date }
 	}
