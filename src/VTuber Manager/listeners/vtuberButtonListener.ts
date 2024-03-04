@@ -23,7 +23,7 @@ export class UserEvent extends Listener {
 			return interaction.deleteReply();
 		} else if (action === 'accept') {
 			await interaction.deferReply({ ephemeral: true });
-			await interaction.message.edit({ components: [] });
+			await interaction.message.edit({ content: `# Approved by ${interaction.user}`, components: [] });
 
 			await VTuberManager.acceptApplication(args[0]);
 
