@@ -284,6 +284,7 @@ class manageVTubers extends EventEmitter {
 			if (application.Status.code !== 'Accepted') {
 				await member.roles.remove(role);
 				clearInterval(interval);
+				return;
 			}
 
 			if (!member.roles.cache.has(role.id)) {
