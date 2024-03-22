@@ -1,7 +1,6 @@
-import { EventEmitter } from 'events';
 import levelDatabase from './levelDataBase';
 
-class LevelManager extends EventEmitter {
+class LevelManager {
 	async addXP(amount: number, toUserId: string) {
 		return this.modifyXP(`+${amount}`, toUserId);
 	}
@@ -35,10 +34,6 @@ class LevelManager extends EventEmitter {
 		let isLevelUp = this.levelUpCheck(userEntry.level, userEntry.experience);
 		const cacheLevelUp = isLevelUp;
 
-		if (isLevelUp) {
-			this.emit('levelledUp', userEntry);
-		}
-
 		while (isLevelUp) {
 			userEntry.experience -= this.calculateNextLevelXP(userEntry.level);
 			userEntry.level += 1;
@@ -49,7 +44,7 @@ class LevelManager extends EventEmitter {
 		userEntry.lastActivity = new Date();
 
 		await userEntry.save();
-		return cacheLevelUp;
+		return { isLevelUp: cacheLevelUp, profile: userEntry };
 	}
 
 	private levelUpCheck(currentLevel: number, currentXP: number) {
