@@ -3,17 +3,12 @@ import { Subcommand } from '@sapphire/plugin-subcommands';
 import levelDatabase from '../lib/levelDataBase';
 import {
 	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
 	ColorResolvable,
 	EmbedBuilder,
-	MessageActionRowComponentBuilder,
-	MessageComponentInteraction,
 	ModalActionRowComponentBuilder,
 	ModalBuilder,
 	TextInputBuilder,
-	TextInputStyle,
-	resolveColor
+	TextInputStyle
 } from 'discord.js';
 import levelManager from '../lib/levelManager';
 import config from '../config.json';
