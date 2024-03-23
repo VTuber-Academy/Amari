@@ -31,8 +31,8 @@ export class UserEvent extends Listener {
 					.setDescription(`Successfully modified <@${userId}>'s levels`)
 					.setColor('Green')
 					.addFields([
-						{ name: 'Levels', value: `${profile.level}  ⟫  ${level}`, inline: true },
-						{ name: 'Experience', value: `${profile.experience}  ⟫  ${experience}`, inline: true }
+						{ name: 'Levels', value: `${profile.level}  »  ${level}`, inline: true },
+						{ name: 'Experience', value: `${profile.experience}  »  ${experience}`, inline: true }
 					])
 					.setThumbnail(member.displayAvatarURL())
 					.setFooter({ text: 'Amari Levels' })
