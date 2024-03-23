@@ -28,15 +28,16 @@ export class UserEvent extends Listener {
 				await profile.save();
 
 				const successEmbed = new EmbedBuilder()
-					.setTitle('Success')
-					.setDescription(`Successfully modified ${userId}'s levels`)
+					.setTitle('Success!')
+					.setDescription(`Successfully modified <@${userId}>'s levels`)
 					.setColor('Green')
 					.addFields([
 						{ name: 'Level', value: level, inline: true },
 						{ name: 'Experience', value: experience, inline: true }
 					])
 					.setFooter({ text: 'Amari Levels' })
-					.setAuthor({ name: 'Modify Levels', iconURL: interaction.client.user.displayAvatarURL() });
+					.setTimestamp()
+					.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() });
 
 				await interaction.deferUpdate();
 				return interaction.channel?.send({ embeds: [successEmbed] });
