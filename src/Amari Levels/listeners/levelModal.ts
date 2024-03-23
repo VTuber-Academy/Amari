@@ -38,7 +38,8 @@ export class UserEvent extends Listener {
 					.setFooter({ text: 'Amari Levels' })
 					.setAuthor({ name: 'Modify Levels', iconURL: interaction.client.user.displayAvatarURL() });
 
-				return interaction.reply({ embeds: [successEmbed] });
+				await interaction.deferUpdate();
+				return interaction.channel?.send({ embeds: [successEmbed] });
 			}
 		}
 
