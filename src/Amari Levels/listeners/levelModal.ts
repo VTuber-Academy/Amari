@@ -23,24 +23,27 @@ export class UserEvent extends Listener {
 				const profile = await levelDatabase.findOne({ id: userId });
 				if (!profile) return;
 
-				profile.experience = parseInt(experience);
-				profile.level = parseInt(level);
-				await profile.save();
+				const member = await interaction.guild?.members.fetch(userId);
+				if (!member) return;
 
 				const successEmbed = new EmbedBuilder()
 					.setTitle('Success!')
 					.setDescription(`Successfully modified <@${userId}>'s levels`)
 					.setColor('Green')
 					.addFields([
-						{ name: 'Level', value: level, inline: true },
-						{ name: 'Experience', value: experience, inline: true }
+						{ name: 'Levels', value: `${profile.level}  ⟫  ${level}`, inline: true },
+						{ name: 'Experience', value: `${profile.experience}  ⟫  ${experience}`, inline: true }
 					])
+					.setThumbnail(member.displayAvatarURL())
 					.setFooter({ text: 'Amari Levels' })
 					.setTimestamp()
 					.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() });
 
-				await interaction.deferUpdate();
-				return interaction.channel?.send({ embeds: [successEmbed] });
+				profile.experience = parseInt(experience);
+				profile.level = parseInt(level);
+				await profile.save();
+
+				return interaction.reply({ embeds: [successEmbed] });
 			}
 		}
 
