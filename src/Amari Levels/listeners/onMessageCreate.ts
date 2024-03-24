@@ -26,16 +26,18 @@ export class UserEvent extends Listener {
 		await levelManager.addXP(xp, message.author.id).then(async (levelled) => {
 			const firstTimeEmbedLevel = new EmbedBuilder()
 				.setColor('Blurple')
-				.setDescription('Congratulations for levelling up for the first time in this cycle! Your message has been reacted with a ⭐ to indicate that you have levelled up!\n\nYou can always check your rank and leaderboard by using the levels command within the server!\n\nThe top 3 members active in the server will be rewarded with a special role at the end of the cycle! Good luck!')
+				.setDescription(
+					'Congratulations for levelling up for the first time in this cycle! Your message has been reacted with a ⭐ to indicate that you have levelled up!\n\nYou can always check your rank and leaderboard by using the levels command within the server!\n\nThe top 3 members active in the server will be rewarded with a special role at the end of the cycle! Good luck!'
+				)
 				.setFooter({ text: 'This notification will only be shown once per cycle!' })
 				.setTimestamp();
 
 			if (levelled.isLevelUp) {
 				await message.react('⭐').catch((err) => message.client.logger.error(err));
-			}
 
-			if (levelled.profile.level === 1) {
-				await message.channel.send({ embeds: [firstTimeEmbedLevel] }).catch(() => 0);
+				if (levelled.profile.level === 1) {
+					await message.author.send({ embeds: [firstTimeEmbedLevel] }).catch(() => 0);
+				}
 			}
 		});
 
