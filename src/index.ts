@@ -8,6 +8,9 @@ import modules from './moduleRegistry.json';
 import { join } from 'node:path';
 import fs from 'fs';
 
+import dotenv from 'dotenv';
+dotenv.config({ path: './src/.env' });
+
 interface PluginManifest {
 	Name: string;
 	Version: number;
