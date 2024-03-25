@@ -6,7 +6,7 @@ import { ActivityType, GatewayIntentBits, Partials } from 'discord.js';
 import { getRootData } from '@sapphire/pieces';
 import modules from './moduleRegistry.json';
 import { join } from 'node:path';
-import fs from 'node:fs';
+import fs from 'fs';
 
 // Ensure .env is loaded properly despite skyra's env-utilities
 import dotenv from 'dotenv';
