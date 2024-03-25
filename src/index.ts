@@ -6,10 +6,11 @@ import { ActivityType, GatewayIntentBits, Partials } from 'discord.js';
 import { getRootData } from '@sapphire/pieces';
 import modules from './moduleRegistry.json';
 import { join } from 'node:path';
-import fs from 'fs';
+import fs from 'node:fs';
 
+// Ensure .env is loaded properly despite skyra's env-utilities
 import dotenv from 'dotenv';
-dotenv.config({ path: './src/.env' });
+dotenv.config({ path: './src/.env', override: true });
 
 interface PluginManifest {
 	Name: string;
@@ -59,10 +60,14 @@ const main = async () => {
 				let pluginWorkingFolder = join(rootData.root, path);
 				let manifest: PluginManifest = JSON.parse(fs.readFileSync(join(pluginWorkingFolder, 'manifest.json'), 'utf-8'));
 
-				const pluginConfig = JSON.stringify(manifest.configurationProfiles[process.env.NODE_ENV]);
-				fs.writeFileSync(join(pluginWorkingFolder, 'config.json'), pluginConfig, 'utf-8');
+				console.log(process.env.NODE_ENV);
 
-				client.stores.registerPath(join(rootData.root, path));
+				const pluginConfig = JSON.stringify(manifest.configurationProfiles[process.env.NODE_ENV]);
+				fs.writeFileSync(join(pluginWorkingFolder, 'config.json'), pluginConfig, {
+					encoding: 'utf-8'
+				});
+
+				client.stores.registerPath(pluginWorkingFolder);
 				client.logger.info(`Successfully registered ${manifest.Name} v${manifest.Version}`);
 			} catch (error) {
 				client.logger.fatal(`Cannot Load ${name} from path ${path}!`);
