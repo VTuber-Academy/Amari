@@ -34,7 +34,7 @@ export class UserCommand extends Subcommand {
 		const imageOfTheMonth = await this.container.unsplash.search
 			.getPhotos({
 				query: today.toLocaleString('default', { month: 'long' }),
-				orderBy: 'latest',
+				orderBy: 'relevant',
 				perPage: 1
 			})
 			.then((res) => res.response?.results[0].urls.regular);
@@ -75,6 +75,7 @@ export class UserCommand extends Subcommand {
 			.setImage(imageOfTheMonth)
 			.setTimestamp();
 
-		return interaction.editReply({ embeds: [embed1] });
+		await interaction.editReply('Sent!');
+		return interaction.channel?.send({ embeds: [embed1] });
 	}
 }

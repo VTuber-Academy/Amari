@@ -62,8 +62,6 @@ const main = async () => {
 				let pluginWorkingFolder = join(rootData.root, path);
 				let manifest: PluginManifest = JSON.parse(fs.readFileSync(join(pluginWorkingFolder, 'manifest.json'), 'utf-8'));
 
-				console.log(process.env.NODE_ENV);
-
 				const pluginConfig = JSON.stringify(manifest.configurationProfiles[process.env.NODE_ENV]);
 				fs.writeFileSync(join(pluginWorkingFolder, 'config.json'), pluginConfig, {
 					encoding: 'utf-8'
