@@ -41,7 +41,7 @@ export class UserCommand extends Subcommand {
 
 		if (!imageOfTheMonth) return interaction.editReply('Failed to fetch image of the month!');
 
-		const bans = await interaction.guild?.bans.fetch({ after: `${(today.getTime() - new Duration('1 month').offset) / 1000}` });
+		const bans = await interaction.guild?.bans.fetch({ after: `${Math.floor((today.getTime() - new Duration('1 month').offset) / 1000)}` });
 		const susAccounts = bans?.filter((ban) => ban.reason?.startsWith('Suspicious or spam account'));
 
 		let banCounts = { manual: 0, auto: 0 };
