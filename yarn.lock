@@ -2879,6 +2879,11 @@ undici@^5.27.2:
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
+unsplash-js@^7.0.19:
+  version "7.0.19"
+  resolved "https://registry.yarnpkg.com/unsplash-js/-/unsplash-js-7.0.19.tgz#36a4ee6d52f2438a5526c08c7018908debba10c7"
+  integrity sha512-j6qT2floy5Q2g2d939FJpwey1yw/GpQecFiSouyJtsHQPj3oqmqq3K4rI+GF8vU1zwGCT7ZwIGQd2dtCQLjYJw==
+
 util-deprecate@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"

@@ -1,12 +1,14 @@
 import './Amari Core/lib/setup';
 
-import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { LogLevel, SapphireClient, container } from '@sapphire/framework';
 import { ActivityType, GatewayIntentBits, Partials } from 'discord.js';
 
 import { getRootData } from '@sapphire/pieces';
 import modules from './moduleRegistry.json';
 import { join } from 'node:path';
 import fs from 'fs';
+
+import { createApi } from 'unsplash-js';
 
 // Ensure .env is loaded properly despite skyra's env-utilities
 import dotenv from 'dotenv';
@@ -78,6 +80,17 @@ const main = async () => {
 			}
 		}
 
+		if (process.env.Unsplash_AccessKey) {
+			const unsplashApi = createApi({
+				accessKey: process.env.Unsplash_AccessKey,
+				fetch: fetch
+			});
+
+			container.unsplash = unsplashApi;
+		} else {
+			client.logger.warn('Unsplash API key not found. Some features may not work as intended.');
+		}
+
 		client.logger.info('Logging in');
 		await client.login();
 		client.logger.info(`Successfully logged in as ${client.user?.username}`);
@@ -89,3 +102,9 @@ const main = async () => {
 };
 
 main();
+
+declare module '@sapphire/pieces' {
+	interface Container {
+		unsplash: ReturnType<typeof createApi>;
+	}
+}
