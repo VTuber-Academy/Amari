@@ -25,6 +25,7 @@ export class UserEvent extends Listener {
 		if (!message.member?.roles.cache.has('1221476114220974220')) {
 			await message.member?.roles.add('1221476114220974220');
 		}
+
 		const xp = Math.floor(Math.random() * 16) + 15;
 		await levelManager.addXP(xp, message.author.id).then(async (levelled) => {
 			const firstTimeEmbedLevel = new EmbedBuilder()
