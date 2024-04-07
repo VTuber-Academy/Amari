@@ -33,139 +33,136 @@ interface ExtractedDataFields {
 let commonEnglishNames: string[] = [];
 
 @ApplyOptions<Listener.Options>({
-	event: Events.GuildMemberAdd
+	event: Events.GuildMemberUpdate
 })
 export class UserEvent extends Listener {
-	public override async run(member: GuildMember) {
-		try {
-			const screeningResults: ScreeningResults = { isFlagged: false, redFlags: [] };
+	public override async run(oldMember: GuildMember, newMember: GuildMember) {
+		if (newMember.roles.cache.has(config.NoConsentRole)) {
+			newMember.kick('Removed VTA Bot Information Usage Consent');
+		}
 
-			const staffChannel = (await member.guild.channels.fetch(config.securityGate).catch(() => {
-				throw new Error('Sentry => NO_STAFF_CHANNEL');
-			})) as GuildTextBasedChannel;
-			if (!staffChannel) return;
+		if (oldMember.pending && !newMember.pending) {
+			try {
+				oldMember.client.logger.debug(`[Sentry] Screening started for [${oldMember.user.username}](${oldMember.user.id})`);
+				const screeningResults: ScreeningResults = { isFlagged: false, redFlags: [] };
 
-			const tranquilizerRole = await member.guild.roles.fetch(config.tranquilizerRole).catch(() => {
-				throw new Error('Sentry => NO_ROLE_FOUND');
-			});
-			if (!tranquilizerRole) return;
+				const staffChannel = (await newMember.guild.channels.fetch(config.securityGate).catch((err) => {
+					throw new Error(`[Sentry] Failed, errored while fetching the staff channel!\n${err}`);
+				})) as GuildTextBasedChannel;
+				if (!staffChannel) return;
 
-			if (commonEnglishNames.length === 0) {
-				commonEnglishNames = (await this.parseNames()) as string[];
-			}
+				const tranquilizerRole = await newMember.guild.roles.fetch(config.tranquilizerRole).catch((err) => {
+					throw new Error(`[Sentry] Failed, errored while fetching the tranquilizer role!\n${err}`);
+				});
+				if (!tranquilizerRole) return;
 
-			const generatedUsernameRegex = new RegExp(commonEnglishNames.join('|'), 'i');
-
-			if (DateTime.fromJSDate(member.user.createdAt) > DateTime.now().minus({ months: 6 })) {
-				if (DateTime.fromJSDate(member.user.createdAt) > DateTime.now().minus({ months: 1 })) {
-					screeningResults.isFlagged = true;
-					screeningResults.redFlags.push('[❗] Account Age Younger than 1 month');
-				} else {
-					screeningResults.redFlags.push('[❕] Account Age Younger than 6 months');
+				if (commonEnglishNames.length === 0) {
+					commonEnglishNames = (await this.parseNames()) as string[];
 				}
-			}
 
-			const usernameMatcher = generatedUsernameRegex.exec(member.user.username);
-			if (usernameMatcher) {
-				screeningResults.redFlags.push(
-					`[❗] Username has items from the common english names registry!\n- Matches: ${usernameMatcher.join(', ')}`
-				);
-			}
+				// Convert the array of names into a regex pattern which we will later match
+				const generatedUsernameRegex = new RegExp(commonEnglishNames.join('|'), 'i');
 
-			const displayNameMatcher = generatedUsernameRegex.exec(member.user.displayName);
-			if (displayNameMatcher) {
-				screeningResults.redFlags.push(
-					`[❗] Display Name has items from the common english names registry!\n- Matches: ${displayNameMatcher.join(', ')}`
-				);
-			}
-
-			let nsfwProfileAPIoptions = {
-				method: 'POST',
-				url: 'https://api.edenai.run/v2/image/explicit_content',
-				headers: {
-					Authorization: `Bearer ${process.env.EdenAI}`
-				},
-				data: {
-					show_original_response: false,
-					fallback_providers: '',
-					providers: 'api4ai',
-					file_url: member.user.displayAvatarURL({ extension: 'png', size: 128 })
-				}
-			};
-
-			await axios.request(nsfwProfileAPIoptions).then(
-				(response) => {
-					if (response.data['eden-ai'].nsfw_likelihood === 5) {
-						screeningResults.isFlagged = true;
-					} else if (response.data['eden-ai'].nsfw_likelihood > 3) {
-						screeningResults.redFlags.push(
-							`[❗] Eden detects suggestive profile picture\n- NSFW Likelihood: ${response.data['eden-ai'].nsfw_likelihood} / 5`
-						);
-					}
-				},
-				(error) => {
-					staffChannel.send(`Cannot scan ${member}'s pfp with AI`);
-					console.log(error);
-				}
-			);
-
-			if (!screeningResults.isFlagged && screeningResults.redFlags.length >= 2) {
-				screeningResults.isFlagged = true;
-			}
-
-			const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-				new ButtonBuilder()
-					.setCustomId(`screening-approve-${member.user.id}`)
-					.setLabel(`Approve ${member.displayName}`)
-					.setStyle(ButtonStyle.Success),
-				new ButtonBuilder()
-					.setCustomId(`screening-reject-${member.user.id}`)
-					.setLabel(`Reject ${member.displayName}`)
-					.setStyle(ButtonStyle.Danger)
-			);
-
-			if (screeningResults.isFlagged) {
-				const flaggedEmbed = new EmbedBuilder()
-					.setColor('DarkRed')
-					.setTitle('Sorry for the Delay!')
-					.setDescription(
-						"This is Amari speaking, codenamed VTA-Bot.\n\nAmari watches over members within the discord server and is excited to welcome you! It seems that your profile has triggered a few safety traps coded within me but don't fret! A staff has been notified to manually review you! If you still can't access the server after a few days of waiting, please contact <@575252669443211264>. \n\nSee you soon!"
-					)
-					.addFields({ name: 'Reasons', value: screeningResults.redFlags.join('\n') })
-					.setTimestamp()
-					.setThumbnail('https://cdn.discordapp.com/emojis/805667882968547340.webp?size=256'); // Alybonk emoji :3
-
-				let notified: boolean = false;
-				await member.roles.add(tranquilizerRole);
-				await member.send({ embeds: [flaggedEmbed] }).then(
-					() => (notified = true),
-					() => (notified = false)
-				);
-				flaggedEmbed.setFooter({ text: notified ? 'DM Sent successfully' : 'Could not contact member' });
-
-				flaggedEmbed
-					.setTitle('Member has been flagged!')
-					.setDescription('Amari flagged a member! Please respond to this ASAP to maintain good relations with said member!')
-					.addFields({ name: 'Flagged Member', value: `${member}` });
-
-				await staffChannel.send({ embeds: [flaggedEmbed], components: [staffActionRow] });
-			} else {
-				const acceptedEmbed = new EmbedBuilder()
-					.setColor('Green')
-					.setTitle('Welcome to the VTA!')
-					.setDescription(
-						'This is Amari speaking, codenamed VTA-Bot.\n\nAmari watches over members within the discord server and is excited to welcome you! You have passed our automated safety checks and now you are welcome to freely chat in our server! If you have any questions, contact <@575252669443211264> and a human will be there with you shorty.\n\nSee you soon!'
-					)
+				const staffEmbed = new EmbedBuilder()
+					.setColor('DarkButNotBlack')
+					.setAuthor({ name: newMember.user.username, iconURL: newMember.user.displayAvatarURL() })
+					.setThumbnail('https://cdn3.emoji.gg/emojis/4133-bluediscordshield.png')
+					.addFields([
+						{ name: 'User:', value: `${newMember}`, inline: true },
+						{ name: 'Account Age:', value: `<t:${newMember.user.createdTimestamp}:R>`, inline: true }
+					])
 					.setTimestamp();
 
-				await member.send({ embeds: [acceptedEmbed] }).catch(() => null); // Ignore failure, welcome messages are often ignored anyways :c
+				newMember.client.logger.debug(`[Sentry] parsed ${commonEnglishNames.length} names`);
+				if (DateTime.fromJSDate(newMember.user.createdAt) > DateTime.now().minus({ months: 6 })) {
+					if (DateTime.fromJSDate(newMember.user.createdAt) > DateTime.now().minus({ months: 1 })) {
+						screeningResults.isFlagged = true;
+						screeningResults.redFlags.push('[❗] Account Age Younger than 1 month');
+					} else {
+						screeningResults.redFlags.push('[❕] Account Age Younger than 6 months');
+					}
+				}
 
-				acceptedEmbed.setDescription(`${member} has passed all automated checks and was allowed to enter the VTA!`);
-				await staffChannel.send({ embeds: [acceptedEmbed], components: [staffActionRow] });
+				const usernameMatcher = generatedUsernameRegex.exec(newMember.user.username);
+				if (usernameMatcher) {
+					screeningResults.redFlags.push(`[❗] Username has items from the common english names registry!`);
+				}
+
+				newMember.client.logger.debug(`[Sentry] matched ${usernameMatcher} in ${newMember.user.username}`);
+
+				const displayNameMatcher = generatedUsernameRegex.exec(newMember.user.displayName);
+				if (displayNameMatcher) {
+					screeningResults.redFlags.push(`[❗] Display Name has items from the common english names registry!`);
+				}
+
+				newMember.client.logger.debug(`[Sentry] matched ${displayNameMatcher} in ${newMember.user.displayName}`);
+
+				let nsfwProfileAPIoptions = {
+					method: 'POST',
+					url: 'https://api.edenai.run/v2/image/explicit_content',
+					headers: {
+						Authorization: `Bearer ${process.env.EdenAI}`
+					},
+					data: {
+						show_original_response: false,
+						fallback_providers: '',
+						providers: 'api4ai',
+						file_url: newMember.user.displayAvatarURL({ extension: 'png', size: 128 })
+					}
+				};
+
+				await axios.request(nsfwProfileAPIoptions).then(
+					(response) => {
+						if (response.data['eden-ai'].nsfw_likelihood === 5) {
+							screeningResults.isFlagged = true;
+						} else if (response.data['eden-ai'].nsfw_likelihood > 3) {
+							screeningResults.redFlags.push(
+								`[❗] Eden detects suggestive profile picture\n- NSFW Likelihood: ${response.data['eden-ai'].nsfw_likelihood} / 5`
+							);
+						}
+					},
+					(error) => {
+						staffChannel.send(`Cannot scan ${newMember}'s pfp with AI`);
+						console.log(error);
+					}
+				);
+
+				if (!screeningResults.isFlagged && screeningResults.redFlags.length >= 2) {
+					screeningResults.isFlagged = true;
+				}
+
+				const staffActionRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+					new ButtonBuilder()
+						.setCustomId(`screening-approve-${newMember.user.id}`)
+						.setLabel(`Let ${newMember.user.username} in!`)
+						.setStyle(ButtonStyle.Success)
+						.setEmoji('⭐'),
+					new ButtonBuilder()
+						.setCustomId(`screening-reject-${newMember.user.id}`)
+						.setLabel(`Ban ${newMember.user.username}`)
+						.setStyle(ButtonStyle.Danger)
+						.setEmoji('🔨')
+				);
+
+				if (screeningResults.isFlagged) {
+					await newMember.roles.add(tranquilizerRole);
+
+					staffEmbed.addFields([{ name: 'Triggers:', value: screeningResults.redFlags.join('\n') }]);
+					staffEmbed.setFooter({
+						text: 'Waiting for staff input...',
+						iconURL: 'https://cdn3.emoji.gg/emojis/4517-warning.png'
+					});
+				} else {
+					staffEmbed.setFooter({
+						text: 'User has been approved! 🎉'
+					});
+				}
+
+				await staffChannel.send({ embeds: [staffEmbed], components: screeningResults.isFlagged ? [staffActionRow] : undefined });
+			} catch (error) {
+				this.container.logger.error(`[Sentry] failed to screen @${newMember.user.username}[${newMember.user.id}]`);
+				this.container.logger.error(error);
 			}
-		} catch (error) {
-			this.container.logger.error(`[Sentry] failed to screen @${member.user.username}[${member.user.id}]`);
-			this.container.logger.error(error);
 		}
 	}
 
@@ -181,7 +178,7 @@ export class UserEvent extends Listener {
 			});
 
 			stream.on('end', () => {
-				this.container.logger.info(`Finalized and Parsed ${names.length} names`);
+				this.container.logger.debug(`Finalized and Parsed ${names.length} names`);
 				resolve(names);
 			});
 

@@ -6,12 +6,15 @@
 		"production": {
 			"tranquilizerRole": "1146326445245870212",
 			"securityGate": "747486764834357391",
-			"staffNotificationChannel": "970351474364256366"
+			"staffNotificationChannel": "970351474364256366",
+			"NoConsentRole":"1226557507992948838"
 		},
 		"development": {
 			"tranquilizerRole": "1155362562494435378",
 			"securityGate": "1155362563245232221",
-			"staffNotificationChannel": "1155362563245232222"
+			"staffNotificationChannel": "1155362563245232222",
+						"NoConsentRole":"1226557507992948838"
+
 		}
 	}
 }
