@@ -103,22 +103,22 @@ export class UserEvent extends Listener {
 			if (DateTime.fromJSDate(member.user.createdAt) > DateTime.now().minus({ months: 6 })) {
 				if (DateTime.fromJSDate(member.user.createdAt) > DateTime.now().minus({ months: 1 })) {
 					screeningResults.isFlagged = true;
-					screeningResults.redFlags.push('[❗] Account Age Younger than 1 month');
+					screeningResults.redFlags.push('❗ Account Age Younger than 1 month');
 				} else {
-					screeningResults.redFlags.push('[❕] Account Age Younger than 6 months');
+					screeningResults.redFlags.push('❕ Account Age Younger than 6 months');
 				}
 			}
 
 			const usernameMatcher = generatedUsernameRegex.exec(member.user.username);
 			if (usernameMatcher) {
-				screeningResults.redFlags.push(`[❗] Username has items from the common english names registry!`);
+				screeningResults.redFlags.push(`❕ Username has items from the common english names registry!`);
 			}
 
 			this.container.client.logger.debug(`[Sentry] matched ${usernameMatcher} in ${member.user.username}`);
 
 			const displayNameMatcher = generatedUsernameRegex.exec(member.user.displayName);
 			if (displayNameMatcher) {
-				screeningResults.redFlags.push(`[❗] Display Name has items from the common english names registry!`);
+				screeningResults.redFlags.push(`❕ Display Name has items from the common english names registry!`);
 			}
 
 			member.client.logger.debug(`[Sentry] matched ${displayNameMatcher} in ${member.user.displayName}`);
@@ -139,12 +139,12 @@ export class UserEvent extends Listener {
 
 			await axios.request(nsfwProfileAPIoptions).then(
 				(response) => {
-					staffEmbed.addFields([{ name: 'profile picture NSFW Likelihood:', value: response.data['eden-ai'].nsfw_likelihood }]);
+					staffEmbed.addFields([{ name: 'profile picture NSFW Likelihood:', value: `${response.data['eden-ai'].nsfw_likelihood} / 5` }]);
 					if (response.data['eden-ai'].nsfw_likelihood === 5) {
 						screeningResults.isFlagged = true;
 					} else if (response.data['eden-ai'].nsfw_likelihood > 3) {
 						screeningResults.redFlags.push(
-							`[❗] Eden detects suggestive profile picture\n- NSFW Likelihood: ${response.data['eden-ai'].nsfw_likelihood} / 5`
+							`❗ Eden detects suggestive profile picture\n- NSFW Likelihood: ${response.data['eden-ai'].nsfw_likelihood} / 5`
 						);
 					}
 				},
