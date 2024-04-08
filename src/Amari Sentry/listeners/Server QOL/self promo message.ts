@@ -95,7 +95,7 @@ export class UserEvent extends Listener {
 					});
 			}
 
-			if (DateTime.fromJSDate(message.member?.joinedAt ?? new Date()).diffNow('days').days < 2) {
+			if (message.member?.joinedAt && DateTime.now().diff(DateTime.fromJSDate(message.member.joinedAt)).as('days') < 2) {
 				await message.delete();
 				await message.author.send('Your message was deleted because you have not been in the server for at least 2 days.').then((msg) => {
 					setTimeout(() => {
