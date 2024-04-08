@@ -42,7 +42,7 @@ export class UserEvent extends Listener {
 			newMember.client.logger.debug(`[Sentry] Kicked ${newMember.user.username}|${newMember.id} for removing consent`);
 		}
 
-		console.log(oldMember.flags.has('CompletedOnboarding'), newMember.flags.has('CompletedOnboarding'));
+		console.log(oldMember.flags, newMember.flags);
 
 		if (!oldMember.flags.has('CompletedOnboarding') && newMember.flags.has('CompletedOnboarding')) {
 			this.screenMember(newMember);
