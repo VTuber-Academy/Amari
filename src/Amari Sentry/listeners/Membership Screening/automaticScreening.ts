@@ -33,20 +33,11 @@ interface ExtractedDataFields {
 let commonEnglishNames: string[] = [];
 
 @ApplyOptions<Listener.Options>({
-	event: Events.GuildMemberUpdate
+	event: Events.GuildMemberAdd
 })
 export class UserEvent extends Listener {
-	public override async run(oldMember: GuildMember, newMember: GuildMember) {
-		if (newMember.roles.cache.has(config.NoConsentRole)) {
-			newMember.kick('Removed VTA Bot Information Usage Consent');
-			newMember.client.logger.debug(`[Sentry] Kicked ${newMember.user.username}|${newMember.id} for removing consent`);
-		}
-
-		console.log(oldMember.flags, newMember.flags);
-
-		if (!oldMember.flags.has('CompletedOnboarding') && newMember.flags.has('CompletedOnboarding')) {
-			this.screenMember(newMember);
-		}
+	public override async run(member: GuildMember) {
+		this.screenMember(member);
 	}
 
 	private async parseNames() {
