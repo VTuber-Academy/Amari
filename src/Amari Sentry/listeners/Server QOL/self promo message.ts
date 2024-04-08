@@ -47,7 +47,7 @@ export class UserEvent extends Listener {
 
 		if (links.length !== 0) {
 			const googleLookup = await axios.post<GoogleLookupResponse>(
-				'https://safebrowsing.googleapis.com/v4/threatMatches:find?key=' + process.env.googleAPI,
+				'https://safebrowsing.googleapis.com/v4/threatMatches:find?key=' + process.env.GoogleAPI,
 				{
 					client: {
 						clientId: name,
