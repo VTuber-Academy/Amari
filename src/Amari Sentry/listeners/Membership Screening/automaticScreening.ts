@@ -39,6 +39,7 @@ export class UserEvent extends Listener {
 	public override async run(oldMember: GuildMember, newMember: GuildMember) {
 		if (newMember.roles.cache.has(config.NoConsentRole)) {
 			newMember.kick('Removed VTA Bot Information Usage Consent');
+			newMember.client.logger.debug(`[Sentry] Kicked ${newMember.user.username}|${newMember.id} for removing consent`);
 		}
 
 		if (oldMember.pending && !newMember.pending) {
@@ -58,6 +59,7 @@ export class UserEvent extends Listener {
 
 				if (commonEnglishNames.length === 0) {
 					commonEnglishNames = (await this.parseNames()) as string[];
+					newMember.client.logger.debug(`[Sentry] parsed ${commonEnglishNames.length} names`);
 				}
 
 				// Convert the array of names into a regex pattern which we will later match
@@ -66,14 +68,13 @@ export class UserEvent extends Listener {
 				const staffEmbed = new EmbedBuilder()
 					.setColor('DarkButNotBlack')
 					.setAuthor({ name: newMember.user.username, iconURL: newMember.user.displayAvatarURL() })
-					.setThumbnail('https://cdn3.emoji.gg/emojis/4133-bluediscordshield.png')
+					.setThumbnail('https://cdn3.emoji.gg/emojis/2592-greendiscordshield.png')
 					.addFields([
 						{ name: 'User:', value: `${newMember}`, inline: true },
-						{ name: 'Account Age:', value: `<t:${newMember.user.createdTimestamp}:R>`, inline: true }
+						{ name: 'Account Age:', value: `<t:${Math.floor(newMember.user.createdTimestamp / 1000)}:R>`, inline: true }
 					])
 					.setTimestamp();
 
-				newMember.client.logger.debug(`[Sentry] parsed ${commonEnglishNames.length} names`);
 				if (DateTime.fromJSDate(newMember.user.createdAt) > DateTime.now().minus({ months: 6 })) {
 					if (DateTime.fromJSDate(newMember.user.createdAt) > DateTime.now().minus({ months: 1 })) {
 						screeningResults.isFlagged = true;
@@ -113,6 +114,7 @@ export class UserEvent extends Listener {
 
 				await axios.request(nsfwProfileAPIoptions).then(
 					(response) => {
+						staffEmbed.addFields([{ name: 'profile picture NSFW Likelihood:', value: response.data['eden-ai'].nsfw_likelihood }]);
 						if (response.data['eden-ai'].nsfw_likelihood === 5) {
 							screeningResults.isFlagged = true;
 						} else if (response.data['eden-ai'].nsfw_likelihood > 3) {
@@ -145,6 +147,7 @@ export class UserEvent extends Listener {
 				);
 
 				if (screeningResults.isFlagged) {
+					staffEmbed.setThumbnail('https://cdn3.emoji.gg/emojis/4133-bluediscordshield.png');
 					await newMember.roles.add(tranquilizerRole);
 
 					staffEmbed.addFields([{ name: 'Triggers:', value: screeningResults.redFlags.join('\n') }]);
@@ -158,7 +161,7 @@ export class UserEvent extends Listener {
 					});
 				}
 
-				await staffChannel.send({ embeds: [staffEmbed], components: screeningResults.isFlagged ? [staffActionRow] : undefined });
+				await staffChannel.send({ embeds: [staffEmbed], components: [staffActionRow] });
 			} catch (error) {
 				this.container.logger.error(`[Sentry] failed to screen @${newMember.user.username}[${newMember.user.id}]`);
 				this.container.logger.error(error);
@@ -178,7 +181,6 @@ export class UserEvent extends Listener {
 			});
 
 			stream.on('end', () => {
-				this.container.logger.debug(`Finalized and Parsed ${names.length} names`);
 				resolve(names);
 			});
 
